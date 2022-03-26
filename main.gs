@@ -149,7 +149,7 @@ function setHelpMessage(post_message){
   }
 }
 
-// profileを取得してくる関数（コピペでOK）
+// profileを取得してくる関数
 function getUserProfile(user_id){ 
   var url = 'https://api.line.me/v2/bot/profile/' + user_id;
   var userProfile = UrlFetchApp.fetch(url,{
