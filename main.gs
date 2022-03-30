@@ -2,7 +2,7 @@ var ACCESS_TOKEN = '<Line Messaging API ACCESS_TOKEN>'
 var SHEET_ID = '<SPREAD SHEET ID>'
 var LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
-const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯楽費','電気代','ガス代','水道代','家賃','その他']
+const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯楽費','電気代','ガス代','水道代','家賃','入金','その他']
 const PAYMENT_STATUS = ['共通財布','精算済','未精算']
 const HELP_MESSAGE_LIST = ['カテゴリ','支払い状況']
 
@@ -149,7 +149,7 @@ function setHelpMessage(post_message){
   }
 }
 
-// profileを取得してくる関数
+// profileを取得してくる関数（コピペでOK）
 function getUserProfile(user_id){ 
   var url = 'https://api.line.me/v2/bot/profile/' + user_id;
   var userProfile = UrlFetchApp.fetch(url,{
