@@ -4,7 +4,9 @@ var LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯楽費','電気代','ガス代','水道代','家賃','入金','その他']
 const PAYMENT_STATUS = ['共通財布','精算済','未精算']
-const HELP_MESSAGE_LIST = ['カテゴリ','支払い状況']
+const HELP_MESSAGE_LIST = ['ヘルプ','カテゴリ','支払い状況']
+const MENU_LIST = ['今月','先月','残高']
+const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + MENU_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。'
 
 /**
  * 　Lineにメッセージをもとに家計簿登録
@@ -35,6 +37,14 @@ function doPost(e){
     return
   }
 
+  //menuメッセージが入力された場合用のメッセージを詰める
+  if(!isNaN(new Date(message_parameter[0])) || MENU_LIST.some(e => e.match(message_parameter[0]))){
+    console.log("reply menu message")
+    //メッセージ送信
+    sendMessage(setMenuMessage(message_parameter[0]),reply_token)
+    return
+  }
+
   //メッセージのバリデートチェック
   console.log('validateMessage start. message_parameter:'+ message_parameter)
   validateResult = validateMessage(message_parameter)
@@ -59,7 +69,6 @@ function doPost(e){
 
   //家計簿シートに登録
   console.log('regist sheet start')
-  console.log(json.events[0].source.userId)
   var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
@@ -93,7 +102,7 @@ function validateMessage(message_parameter){
   }
   
   //1行目の情報チェック(カテゴリ)
-  if(!CATEGORY_LIST.some(e => e.match(message_parameter[0]))){
+  if(!message_parameter[0] || !CATEGORY_LIST.some(e => e.match(message_parameter[0]))){
     return {'result':false,'message':'1行目は、カテゴリを入力してください。\nカテゴリ:' + CATEGORY_LIST}
   }
   //2行目の情報チェック(金額)
@@ -105,7 +114,7 @@ function validateMessage(message_parameter){
     return {'result':false,'message':'3行目は、購入日(yyyy/MM/dd)を入力してください。'}
   }
   //4行目の情報チェック(支払い状況)
-  if(!PAYMENT_STATUS.some(e => e.match(message_parameter[3]))){
+  if(!message_parameter[3] || !PAYMENT_STATUS.some(e => e.match(message_parameter[3]))){
     return {'result':false,'message':'4行目は、支払い状況を入力してください。\n支払い状況:' + PAYMENT_STATUS}
   }
   return {'result': true,'message':''}
@@ -145,8 +154,53 @@ function setHelpMessage(post_message){
     case 'カテゴリ':
       return 'カテゴリは、'+ CATEGORY_LIST + 'のいずれかを入力してください。'
     case '支払い状況':
-      return '支払い状況は、'+PAYMENT_STATUS + 'のいずれかを入力してください。'
+      return '支払い状況は、'+ PAYMENT_STATUS + 'のいずれかを入力してください。'
+    case 'ヘルプ':
+      return HELP_MESSAGE
   }
+}
+
+function setMenuMessage(post_message){
+  
+  switch (post_message) {
+    case '残高':
+      return getBalance(new Date())
+    case '今月':
+      return getBalance(new Date())
+    case '先月':
+      date = new Date()
+      console.log(date)
+      return getBalance(new Date(date.getFullYear(), date.getMonth()-1, 1))
+    default:
+      return getBalance(new Date(post_message))
+  }
+}
+
+function getBalance(date){
+  //家計簿シートから情報取得
+  console.log('get sheet start')
+  if(date.getFullYear < 2021){
+    console.log('out of range year:' + date.getFullYear)
+    return ''
+  }
+  
+  sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
+  //対象月の列を取得
+  row = date.getMonth() + 21
+  //対象月の金額を取得
+  money_range = sheet.getRange(row,3,1,13)
+  
+  //返却値
+  return_message = date.getFullYear() + '/' + String(date.getMonth() + 1) + 'の残高は'
+  column = 3
+  //取得したセルをループして返却値を追加
+  money_range.getValues().forEach(e => {
+    e.forEach( f => {
+    return_message = return_message + '\n' + sheet.getRange(20,column).getValue() + ':' + f
+    column++
+  })})
+
+  return return_message
 }
 
 // profileを取得してくる関数
