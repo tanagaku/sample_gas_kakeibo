@@ -3,6 +3,7 @@ var SHEET_ID = '<SPREAD SHEET ID>'
 var LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯楽費','電気代','ガス代','水道代','家賃','入金','その他']
+const DAY_LIST = ['今日','昨日','一昨日']
 const PAYMENT_STATUS = ['共通財布','精算済','未精算']
 const HELP_MESSAGE_LIST = ['ヘルプ','カテゴリ','支払い状況']
 const MENU_LIST = ['今月','先月','残高']
@@ -57,7 +58,7 @@ function doPost(e){
   }
 
   //購入日をyyyy/MM/dd形式にformat
-  var buy_date = new Date(message_parameter[2])
+  var buy_date = setBuyDate(message_parameter[2])
   var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
   //年単位で記録するシートを分けているので振り分け
   var sheet_name = ''
@@ -110,8 +111,10 @@ function validateMessage(message_parameter){
     return {'result':false,'message':'2行目は、金額を入力してください。'}
   }
   //3行目の情報チェック(購入日)
-  if(isNaN(new Date(message_parameter[2]))){
-    return {'result':false,'message':'3行目は、購入日(yyyy/MM/dd)を入力してください。'}
+  if(!message_parameter[2] || isNaN(new Date(message_parameter[2]))){
+    if(!DAY_LIST.some(e => e.match(message_parameter[2]))){
+      return {'result':false,'message':'3行目は、購入日(yyyy/MM/dd)を入力してください。'}
+    }
   }
   //4行目の情報チェック(支払い状況)
   if(!message_parameter[3] || !PAYMENT_STATUS.some(e => e.match(message_parameter[3]))){
@@ -174,6 +177,22 @@ function setMenuMessage(post_message){
     default:
       return getBalance(new Date(post_message))
   }
+}
+
+function setBuyDate(post_message){
+  if(!isNaN(new Date(post_message))){
+    return new Date(post_message)
+  }
+  now = new Date()
+  switch (post_message){
+    case '今日':
+      return now
+    case '昨日':
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+    case '一昨日':
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2)
+  }
+
 }
 
 function getBalance(date){
