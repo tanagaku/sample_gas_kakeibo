@@ -56,9 +56,7 @@ function doPost(e){
 
   //購入日をyyyy/MM/dd形式にformat
   var buy_date = setBuyDate(message_parameter[2])
-  console.log(buy_date)
   var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
-  console.log(buy_date_str)
   //年単位で記録するシートを分けているので振り分け
   var sheet_name = ''
   if(buy_date.getFullYear != '2022'){
@@ -72,9 +70,8 @@ function doPost(e){
   var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
-
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
-  console.log(user)
+  
   register_sheet.getRange(last_row,1).setValue(timestamp)
   register_sheet.getRange(last_row,2).setValue(message_parameter[0])//カテゴリ
   register_sheet.getRange(last_row,3).setValue(message_parameter[1])//金額
