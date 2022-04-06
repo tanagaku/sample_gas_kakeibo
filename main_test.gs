@@ -21,3 +21,52 @@ function Test_validateMessage () {
     }
   })
 }
+
+function Test_isDatePattern(){
+  exports({
+    'Array': {
+      '#indexOf()': {
+        'yyyy/mm/dd': function () {
+              parameter = '2021/12/21'
+              result = isDatePattern(parameter)
+              assert(result)
+        },
+        'd' : function () {
+              parameter = '2'
+              result = isDatePattern(parameter)
+              assert(result)          
+        },
+        'dd' : function () {
+              parameter = '28'
+              result = isDatePattern(parameter)
+              assert(result)          
+        },
+        'MMdd' : function () {
+              parameter = '1228'
+              result = isDatePattern(parameter)
+              assert(result)          
+        },
+        'yyyy/mm/dd false': function () {
+              parameter = '2021/13/32'
+              result = isDatePattern(parameter)
+              assert(!result)
+        },
+        'd false' : function () {
+              parameter = '0'
+              result = isDatePattern(parameter)
+              assert(!result)          
+        },
+        'dd false' : function () {
+              parameter = '32'
+              result = isDatePattern(parameter)
+              assert(!result)          
+        },
+        'MMdd false' : function () {
+              parameter = '1332'
+              result = isDatePattern(parameter)
+              assert(!result)          
+        }                    
+      }
+    }
+  })
+}
