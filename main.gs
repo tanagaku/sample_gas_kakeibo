@@ -109,7 +109,7 @@ function validateMessage(message_parameter){
     return {'result':false,'message':'2行目は、金額を入力してください。'}
   }
   //3行目の情報チェック(購入日)
-  if(isDatePattern(message_parameter[2])){
+  if(!isDatePattern(message_parameter[2])){
       return {'result':false,'message':'3行目は、購入日(yyyy/MM/dd)を入力してください。'}
   }
   //4行目の情報チェック(支払い状況)
