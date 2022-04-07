@@ -1,4 +1,4 @@
-# gas_kakeibo
+# sample_gas_kakeibo
 
 Google Apps Script(GAS)でSpread Sheetを更新する家計簿用API
 
