@@ -1,5 +1,6 @@
-var ACCESS_TOKEN = '<Line Messaging API ACCESS_TOKEN>'
-var SHEET_ID = '<SPREAD SHEET ID>'
+//別ファイルに切り出し
+//const ACCESS_TOKEN = '<Line Messaging API ACCESS_TOKEN>'
+//const SHEET_ID = '<SPREAD SHEET ID>'
 var LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯楽費','電気代','ガス代','水道代','家賃','入金','その他']
@@ -9,15 +10,11 @@ const HELP_MESSAGE_LIST = ['ヘルプ','カテゴリ','支払い状況']
 const MENU_LIST = ['今月','先月','残高']
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + MENU_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。'
 
-/**
- * 　Lineにメッセージをもとに家計簿登録
- */
 function doPost(e){
   
-  console.log('doPost.event:'+ e.postData.contents)
-  
   var json = JSON.parse(e.postData.contents);
-  
+  console.log('doPost.event:'+ json)
+
   //返信用のトークン取得
   var reply_token = json.events[0].replyToken;
   //トークンが取れなかったら終了
@@ -74,6 +71,7 @@ function doPost(e){
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
+  
   register_sheet.getRange(last_row,1).setValue(timestamp)
   register_sheet.getRange(last_row,2).setValue(message_parameter[0])//カテゴリ
   register_sheet.getRange(last_row,3).setValue(message_parameter[1])//金額
@@ -111,16 +109,83 @@ function validateMessage(message_parameter){
     return {'result':false,'message':'2行目は、金額を入力してください。'}
   }
   //3行目の情報チェック(購入日)
-  if(!message_parameter[2] || isNaN(new Date(message_parameter[2]))){
-    if(!DAY_LIST.some(e => e.match(message_parameter[2]))){
+  if(isDatePattern(message_parameter[2])){
       return {'result':false,'message':'3行目は、購入日(yyyy/MM/dd)を入力してください。'}
-    }
   }
   //4行目の情報チェック(支払い状況)
   if(!message_parameter[3] || !PAYMENT_STATUS.some(e => e.match(message_parameter[3]))){
     return {'result':false,'message':'4行目は、支払い状況を入力してください。\n支払い状況:' + PAYMENT_STATUS}
   }
   return {'result': true,'message':''}
+}
+
+
+function isDatePattern(post_message){
+  if(!post_message){
+    return false
+  }
+
+ if(DAY_LIST.some(e => e.match(post_message))){
+    return true
+  }
+  
+  now = new Date()
+  //1桁もしくは2桁の日付表記の場合
+  if(post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)){
+    target_date = new Date(now.getFullYear(),now.getMonth(),post_message)
+    if(isNaN(target_date)){
+      return false
+    }
+    //存在しない日付の場合(現在月と差分が生まれる場合false)
+    if(target_date.getMonth() != now.getMonth()){
+      return false
+    }
+    return true
+  }
+  
+  //4桁の月日表記の場合
+  if(post_message.match(/^\d{4}$/)){
+    target_date = new Date(now.getFullYear(),post_message.substring(0,2)-1,post_message.substring(2))
+    if(isNaN(target_date)){
+      return false
+    }
+    //存在しない日付の場合(年月が繰り上がりとうしている場合false)
+    if(target_date.getFullYear() != now.getFullYear() || target_date.getMonth()+1 != post_message.substring(0,2)){
+      return false
+    }
+    return true
+  }
+
+  if(post_message != 0 && !isNaN(new Date(post_message))){
+    return true
+  }
+
+  return false
+}
+
+function setBuyDate(post_message){
+  now = new Date()
+  switch (post_message){
+    case '今日':
+      return now
+    case '昨日':
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+    case '一昨日':
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2)
+  }
+
+  now = new Date()
+  //1桁もしくは2桁の日付表記の場合
+  if(post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)){
+    return new Date(now.getFullYear(),now.getMonth(),post_message)
+  }
+  
+  //4桁の月日表記の場合
+  if(post_message.match(/^\d{4}$/)){
+    return new Date(now.getFullYear(),post_message.substring(0,2)-1,post_message.substring(2))
+  }
+
+  return new Date(post_message)
 }
 
 /**
@@ -177,22 +242,6 @@ function setMenuMessage(post_message){
     default:
       return getBalance(new Date(post_message))
   }
-}
-
-function setBuyDate(post_message){
-  if(!isNaN(new Date(post_message))){
-    return new Date(post_message)
-  }
-  now = new Date()
-  switch (post_message){
-    case '今日':
-      return now
-    case '昨日':
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
-    case '一昨日':
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2)
-  }
-
 }
 
 function getBalance(date){
