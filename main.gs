@@ -18,16 +18,16 @@ function doPost(e){
   console.log('doPost.event:'+ e.postData.getDataAsString())
 
   //返信用のトークン取得
-  var reply_token = json.events[0].replyToken;
+  var replyToken = json.events[0].replyToken;
   //トークンが取れなかったら終了
-  if(typeof reply_token === 'undefined'){
+  if(typeof replyToken === 'undefined'){
       console.log('fail to get reply token')
     return;
   }
 
   if(json.events[0].postback){
     postBackData = JSON.parse(json.events[0].postback.data)
-    doPostBack(postBackData,reply_token)
+    doPostBack(postBackData,replyToken)
     return
   }
 
@@ -39,14 +39,14 @@ function doPost(e){
   if(HELP_MESSAGE_LIST.some(e => e.match(message_parameter[0]))){
     console.log("reply help message")
     //メッセージ送信
-    sendTextMessage(setHelpMessage(message_parameter[0]),reply_token)
+    sendTextMessage(setHelpMessage(message_parameter[0]),replyToken)
     return
   }
 
   //削除メッセージが送信されたとき
   if(DELETE.match(message_parameter[0])){
     console.log("reply delete button message")
-    sendDeleteButton(reply_token)
+    sendDeleteButton(replyToken)
     return
   }
 
@@ -54,7 +54,7 @@ function doPost(e){
   if(!isNaN(new Date(message_parameter[0])) || ACCOUNT_LIST.some(e => e.match(message_parameter[0]))){
     console.log("reply menu message")
     //メッセージ送信
-    sendTextMessage(setMenuMessage(message_parameter[0]),reply_token)
+    sendTextMessage(setMenuMessage(message_parameter[0]),replyToken)
   }
 
   //メッセージのバリデートチェック
@@ -64,7 +64,7 @@ function doPost(e){
 
   if(!validateResult.result){
     //メッセージ送信
-    sendTextMessage(validateResult.message,reply_token)
+    sendTextMessage(validateResult.message,replyToken)
     return
   }
 
@@ -97,15 +97,15 @@ function doPost(e){
   register_sheet.getRange(last_row,7).setValue(message_parameter[3])//支払い状況
 
   //メッセージ送信
-  sendTextMessage('登録完了',reply_token)
+  sendTextMessage('登録完了',replyToken)
 }
 
 //postBack時の処理
-function doPostBackData(postBackData,reply_token){
+function doPostBackData(postBackData,replyToken){
   switch (postBackData.action){
     case 'delete':
       console.log('delete record:' + postBackData.row)
-      deleteData(reply_token,postBackData.row)
+      deleteData(replyToken,postBackData.row)
     default:
       console.error('Not assumed postData',postBackData.action)
   }
@@ -191,7 +191,7 @@ function getBalance(date){
 }
 
 //削除メッセージ受信時
-function sendDeleteButton(reply_token){
+function sendDeleteButton(replyToken){
   console.log('send delete button message')
 
   sheet_name = '2022_List'
@@ -229,10 +229,10 @@ function sendDeleteButton(reply_token){
     }
   }]
 
-  sendMessage(LineMessageObject,reply_token)
+  sendMessage(LineMessageObject,replyToken)
 }
 
-function deleteData(reply_token,row){
+function deleteData(replyToken,row){
 
   sheet_name = '2022_List'
   var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
@@ -240,5 +240,5 @@ function deleteData(reply_token,row){
   sheet.deleteRow(row)
 
   //メッセージ送信
-  sendTextMessage('削除完了',reply_token)
+  sendTextMessage('削除完了',replyToken)
 }

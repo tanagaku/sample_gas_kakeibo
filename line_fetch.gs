@@ -1,7 +1,7 @@
 /**
  * Textメッセージを送信する
  */
-function sendTextMessage(post_message,reply_token){
+function sendTextMessage(post_message,replyToken){
   console.log('sendTextMessage:'+ post_message)
 
   const messageObject = [{
@@ -11,14 +11,14 @@ function sendTextMessage(post_message,reply_token){
 }
 
 //メッセージを送信する
-function sendMessage(messageObject,reply_token){
+function sendMessage(messageObject,replyToken){
   const replyHeaders = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + ACCESS_TOKEN
   };
 
   const replyBody = {
-    'replyToken': reply_token,
+    'replyToken': replyToken,
     'messages': messageObject
   };
   const replyOptions = {
