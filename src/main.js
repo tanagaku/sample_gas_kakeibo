@@ -85,7 +85,7 @@ function doPost(e){
 
   //家計簿シートに登録
   console.log('regist sheet start')
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(scriptProperties.getProperty("SHEET_ID")).getSheetByName(sheet_name);
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
@@ -219,7 +219,7 @@ function sendMessage(post_message,reply_token){
 
   const replyHeaders = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + ACCESS_TOKEN
+    'Authorization': 'Bearer ' + scriptProperties.getProperty("ACCESS_TOKEN")
   };
 
   const replyBody = {
@@ -270,7 +270,7 @@ function getBalance(date){
     return ''
   }
   
-  sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
+  sheet = SpreadsheetApp.openById(scriptProperties.getProperty("SHEET_ID")).getSheetByName(String(date.getFullYear()));
   //対象月の列を取得
   row = date.getMonth() + 21
   //対象月の金額を取得
@@ -294,7 +294,7 @@ function getUserProfile(user_id){
   var url = 'https://api.line.me/v2/bot/profile/' + user_id;
   var userProfile = UrlFetchApp.fetch(url,{
     'headers': {
-      'Authorization' :  'Bearer ' + ACCESS_TOKEN,
+      'Authorization' :  'Bearer ' + scriptProperties.getProperty("ACCESS_TOKEN"),
     },
   })
   return JSON.parse(userProfile).displayName;
@@ -305,7 +305,7 @@ function sendDeleteButton(reply_token){
   console.log('send delete button message')
 
   sheet_name = '2022_List'
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(scriptProperties.getProperty("SHEET_ID")).getSheetByName(sheet_name);
   lastRow = register_sheet.getLastRow()
 
   const actions = []
@@ -343,7 +343,7 @@ function sendDeleteButton(reply_token){
 
   const replyHeaders = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + ACCESS_TOKEN
+    'Authorization': 'Bearer ' + scriptProperties.getProperty("ACCESS_TOKEN")
   };
 
   const replyBody = {
@@ -362,7 +362,7 @@ function sendDeleteButton(reply_token){
 function deleteData(reply_token,row){
 
   sheet_name = '2022_List'
-  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var sheet = SpreadsheetApp.openById(scriptProperties.getProperty("SHEET_ID")).getSheetByName(sheet_name);
   //対象行の削除
   sheet.deleteRow(row)
 
