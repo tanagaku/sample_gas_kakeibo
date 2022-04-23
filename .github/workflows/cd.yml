@@ -1,4 +1,8 @@
 name: CD (Build and deploy to production)
+##on:
+##  push:
+##    tags:
+##      - 'v*'
 
 on:
   push:
@@ -15,7 +19,7 @@ jobs:
       - name: Setup Node.js 16.x
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: "16.x"
       - name: Install Clasp
         run: |
           npm init -y
@@ -27,4 +31,4 @@ jobs:
       - name: Deploy
         run: |
           clasp push
-          clasp deploy
+          clasp deploy -d "::set-output name=version::${GITHUB_REF##*/}"
