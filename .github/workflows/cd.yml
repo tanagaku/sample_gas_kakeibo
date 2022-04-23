@@ -31,4 +31,4 @@ jobs:
       - name: Deploy
         run: |
           clasp push
-          clasp deploy -d "::set-output name=version::${GITHUB_REF##*/}"
+          clasp deploy -d ${GITHUB_REF##*/}
