@@ -1,13 +1,9 @@
 name: CD (Build and deploy to production)
-##on:
-##  push:
-##    tags:
-##      - 'v*'
 
 on:
   push:
-    branches:
-      - 8-change_use_clasp
+    tags:
+      - "v*"
   workflow_dispatch:
 jobs:
   deploy:
