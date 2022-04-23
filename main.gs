@@ -12,7 +12,8 @@ const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:�
 
 function doPost(e){
   
-  var json = JSON.parse(e.postData.contents);
+	// メッセージをjsonパースして取得
+	var json = JSON.parse(e.postData.getDataAsString());
   console.log('doPost.event:'+ json)
 
   //返信用のトークン取得
