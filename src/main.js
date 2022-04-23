@@ -1,6 +1,4 @@
-//別ファイルに切り出し
-//const ACCESS_TOKEN = '<Line Messaging API ACCESS_TOKEN>'
-//const SHEET_ID = '<SPREAD SHEET ID>'
+const scriptProperties = PropertiesService.getScriptProperties();
 var LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯楽費','電気代','ガス代','水道代','家賃','入金','その他']
