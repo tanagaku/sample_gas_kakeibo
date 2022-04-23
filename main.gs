@@ -25,18 +25,17 @@ function doPost(e){
     return;
   }
 
- //postBackがある時(=削除時)
- if(json.events[0].postback){
-   postBackData = JSON.parse(json.events[0].postback.data)
-   console.log('delete record:' + postBackData.row)
-   if(postBackData.action == 'delete'){
-    deleteData(reply_token,postBackData.row)
-   }
-   return
- }
+  if(json.events[0].postback){
+    postBackData = JSON.parse(json.events[0].postback.data)
+    doPostBack(postBackData)
+    return
+  }
 
+  doMessage(json)
+}
 
-  //送られたメッセージを取得
+function doMessage(json){
+    //送られたメッセージを取得
   var user_message = json.events[0].message.text;
   var message_parameter = user_message.split(/\r\n|\n/);
 
@@ -104,8 +103,17 @@ function doPost(e){
 
   //メッセージ送信
   sendMessage('登録完了',reply_token)
-  return
+}
 
+//postBack時の処理
+function doPostBackData(postBackData){
+  switch (postBackData.action){
+    case 'delete':
+      console.log('delete record:' + postBackData.row)
+      deleteData(reply_token,postBackData.row)
+    default:
+      console.error('Not assumed postData',postBackData.action)
+  }
 }
 
 /**
