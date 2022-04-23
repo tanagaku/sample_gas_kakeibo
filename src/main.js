@@ -12,7 +12,7 @@ const MENU_LIST = ['今月','先月','残高']
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + MENU_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。'
 
 function doPost(e){
-  console.log("testAction")
+  console.log("testAction2")
 	// メッセージをjsonパースして取得
 	var json = JSON.parse(e.postData.getDataAsString())
   console.log('doPost.event:'+ e.postData.getDataAsString())
