@@ -7,14 +7,15 @@ const CATEGORY_LIST = ['食費','外食費','日用品','ヘルスケア','娯�
 const DAY_LIST = ['今日','昨日','一昨日']
 const PAYMENT_STATUS = ['共通財布','精算済','未精算']
 const HELP_MESSAGE_LIST = ['ヘルプ','カテゴリ','支払い状況']
+const DELETE = '削除'
 const MENU_LIST = ['今月','先月','残高']
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + MENU_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。'
 
 function doPost(e){
   
 	// メッセージをjsonパースして取得
-	var json = JSON.parse(e.postData.getDataAsString());
-  console.log('doPost.event:'+ json)
+	var json = JSON.parse(e.postData.getDataAsString())
+  console.log('doPost.event:'+ e.postData.getDataAsString())
 
   //返信用のトークン取得
   var reply_token = json.events[0].replyToken;
@@ -24,9 +25,27 @@ function doPost(e){
     return;
   }
 
+ //postBackがある時(=削除時)
+ if(json.events[0].postback){
+   postBackData = JSON.parse(json.events[0].postback.data)
+   console.log('delete record:' + postBackData.row)
+   if(postBackData.action == 'delete'){
+    deleteData(reply_token,postBackData.row)
+   }
+   return
+ }
+
+
   //送られたメッセージを取得
   var user_message = json.events[0].message.text;
   var message_parameter = user_message.split(/\r\n|\n/);
+
+  //削除メッセージが送信されたとき
+  if(DELETE.match(message_parameter[0])){
+    console.log("reply delete button message")
+    sendDeleteButton(reply_token)
+    return
+  }
 
   //helpメッセージが入力された場合用のメッセージを詰める
   if(HELP_MESSAGE_LIST.some(e => e.match(message_parameter[0]))){
@@ -281,4 +300,75 @@ function getUserProfile(user_id){
     },
   })
   return JSON.parse(userProfile).displayName;
+}
+
+//削除メッセージ受信時
+function sendDeleteButton(reply_token){
+  console.log('send delete button message')
+
+  sheet_name = '2022_List'
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  lastRow = register_sheet.getLastRow()
+
+  const actions = []
+  //3行分のデータを取得(ボタンテンプレートはMax4件まで)
+  for(i = 0;i < 3;i ++){
+    records =  register_sheet.getRange(lastRow - i,2,1,3).getValues().map(e => {
+      e[1] = e[1] + "円"
+      if(date = new Date(e[2]) ){
+        e[2] = date.getMonth()+1 + "/" + date.getDate()
+      }
+      return e
+    })
+    
+    actions.push(
+      {
+        "type": "postback",
+        "label": records.join(","),
+        "data": JSON.stringify({"action":"delete","row":lastRow -i})
+      }
+    )
+  }
+
+  console.log(actions)
+
+  const LineMessageObject = [{
+    "type": "template",
+    "altText": "This is a buttons template",
+    "template": {
+      "type": "buttons",
+      "title": "削除",
+      "text": "削除する記録を選択してください",
+      "actions": actions
+    }
+  }]
+
+  const replyHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + ACCESS_TOKEN
+  };
+
+  const replyBody = {
+    'replyToken': reply_token,
+    'messages': LineMessageObject
+  };
+  const replyOptions = {
+    'method': 'POST',
+    'headers': replyHeaders,
+    'payload': JSON.stringify(replyBody)
+  };
+
+  UrlFetchApp.fetch(LINE_URL, replyOptions);
+}
+
+function deleteData(reply_token,row){
+
+  sheet_name = '2022_List'
+  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  //対象行の削除
+  sheet.deleteRow(row)
+
+  //メッセージ送信
+  sendMessage('削除完了',reply_token)
+
 }
