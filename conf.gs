@@ -1,2 +1,0 @@
-const ACCESS_TOKEN ='DQYt79Al3oC8o2ht6wPuLhsHmIg4hCs44BIu2BqbMPA2nhf8JmUKFQu99rJSyzoymbPHL2nHVnyMDSg3IEWEOezyqbbAqWhAQj0LcKDSj7BzQuBof/f4h6VqCdYbveNBxmj+daa11lrypaDsB+/lLgdB04t89/1O/w1cDnyilFU=';
-const SHEET_ID = '145PtoBoZwNJO81OuJDW57Yq3fHl7EZsnvi0nh-X5IoE';
