@@ -79,7 +79,7 @@ function doPost(e) {
 
   //家計簿シートに登録
   console.log('regist sheet start')
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(scriptProperties.getProperty("SHEET_ID")).getSheetByName(sheet_name);
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
