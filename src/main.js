@@ -25,7 +25,7 @@ function doPost(e) {
 
   if (json.events[0].postback) {
     postBackData = JSON.parse(json.events[0].postback.data)
-    doPostBack(postBackData, replyToken)
+    doPostBackData(postBackData, replyToken)
     return
   }
 
