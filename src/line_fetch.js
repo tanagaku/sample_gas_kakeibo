@@ -8,6 +8,8 @@ function sendTextMessage(post_message, replyToken) {
     'type': 'text',
     'text': post_message
   }];
+
+  sendMessage(messageObject, replyToken)
 }
 
 //メッセージを送信する
