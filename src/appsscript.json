@@ -20,5 +20,8 @@
     "https://www.googleapis.com/auth/script.external_request",
     "https://mail.google.com/",
     "https://www.googleapis.com/auth/presentations"
-  ]
+  ],
+  "executionApi": {
+    "access": "ANYONE"
+  }
 }
