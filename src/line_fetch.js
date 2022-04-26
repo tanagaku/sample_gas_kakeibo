@@ -16,7 +16,7 @@ function sendTextMessage(post_message, replyToken) {
 function sendMessage(messageObject, replyToken) {
   const replyHeaders = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
+    'Authorization': 'Bearer ' + ACCESS_TOKEN
   };
 
   const replyBody = {
@@ -37,7 +37,7 @@ function getUserProfile(user_id) {
   var url = 'https://api.line.me/v2/bot/profile/' + user_id;
   var userProfile = UrlFetchApp.fetch(url, {
     'headers': {
-      'Authorization': 'Bearer ' + SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN"),
+      'Authorization': 'Bearer ' + ACCESS_TOKEN,
     },
   })
   return JSON.parse(userProfile).displayName;
