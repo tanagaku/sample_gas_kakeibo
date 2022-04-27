@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+env:
+  #URL for posting job results to slack
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 jobs:
   deploy:
     runs-on: ubuntu-20.04
@@ -28,3 +31,20 @@ jobs:
         run: |
           clasp push
           clasp deploy -d ${GITHUB_REF##*/}
+      # 成功時はこちらのステップが実行される
+      - name: Slack Notification on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.0.2
+        env:
+          SLACK_CHANNEL: alert_ci
+          SLACK_TITLE: Deploy Success
+          SLACK_COLOR: good
+
+      # 失敗時はこちらのステップが実行される
+      - name: Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2.0.2
+        if: failure()
+        env:
+          SLACK_CHANNEL: alert_ci
+          SLACK_TITLE: Deploy Failure
+          SLACK_COLOR: danger
