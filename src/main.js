@@ -1,4 +1,7 @@
 const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
+const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
+const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
 var LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 const CATEGORY_LIST = ['食費', '外食費', '日用品', 'ヘルスケア', '娯楽費', '電気代', 'ガス代', '水道代', '家賃', '入金', 'その他']
@@ -79,7 +82,7 @@ function doPost(e) {
 
   //家計簿シートに登録
   console.log('regist sheet start')
-  var register_sheet = SpreadsheetApp.openById(SCRIPT_PROPERTIES.getProperty("SHEET_ID")).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
@@ -169,7 +172,7 @@ function getBalance(date) {
     return ''
   }
 
-  sheet = SpreadsheetApp.openById(SCRIPT_PROPERTIES.getProperty("SHEET_ID")).getSheetByName(String(date.getFullYear()));
+  sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
   //対象月の列を取得
   row = date.getMonth() + 21
   //対象月の金額を取得
@@ -194,7 +197,7 @@ function sendDeleteButton(replyToken) {
   console.log('send delete button message')
 
   sheet_name = '2022_List'
-  var register_sheet = SpreadsheetApp.openById(SCRIPT_PROPERTIES.getProperty("SHEET_ID")).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
   lastRow = register_sheet.getLastRow()
 
   const actions = []
@@ -234,7 +237,7 @@ function sendDeleteButton(replyToken) {
 function deleteData(replyToken, row) {
 
   sheet_name = '2022_List'
-  var sheet = SpreadsheetApp.openById(SCRIPT_PROPERTIES.getProperty("SHEET_ID")).getSheetByName(sheet_name);
+  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
   //対象行の削除
   sheet.deleteRow(row)
 

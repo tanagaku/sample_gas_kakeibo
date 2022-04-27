@@ -13,5 +13,15 @@
     "executeAs": "USER_DEPLOYING",
     "access": "ANYONE_ANONYMOUS"
   },
-  "runtimeVersion": "V8"
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://mail.google.com/",
+    "https://www.googleapis.com/auth/presentations"
+  ],
+  "executionApi": {
+    "access": "ANYONE"
+  }
 }
