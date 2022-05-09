@@ -134,6 +134,11 @@ function setBuyDate(post_message) {
     return new Date(now.getFullYear(), post_message.substring(0, 2) - 1, post_message.substring(2))
   }
 
+  //mm/dd形式の場合
+  if (post_message.match(/^\d{1,2}\/\d{1,2}$/)) {
+    dateArray = post_message.split('/');
+    return new Date(now.getFullYear(), dateArray[0] - 1, dateArray[1])
+  }
   return new Date(post_message)
 }
 

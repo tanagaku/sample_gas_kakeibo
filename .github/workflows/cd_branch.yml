@@ -1,4 +1,4 @@
-name: CI (Build and Only Push to production)
+name: CD (Build and Only Push to production)
 
 on:
   push:
