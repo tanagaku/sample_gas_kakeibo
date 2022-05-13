@@ -1,3 +1,9 @@
+const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
+const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
+const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
+const LINE_URL = "https://api.line.me/v2/bot/message/reply"
+
 /**
  * Textメッセージを送信する
  */

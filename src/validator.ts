@@ -1,6 +1,8 @@
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from './constant';
+
 //export for test
 module.exports.isDatePattern = isDatePattern;
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from './constant';
+module.exports.validateRegistMessage = validateRegistMessage;
 
 /**
  * 送られてきたメッセージのバリデートチェック
