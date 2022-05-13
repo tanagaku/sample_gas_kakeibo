@@ -43,9 +43,13 @@ function isDatePattern(post_message: string) {
 
   const now = new Date()
   //1桁もしくは2桁の日付表記の場合
+  if (post_message == '0') {
+    return false
+  }
+
   if (post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)) {
     const target_date = new Date(now.getFullYear(), now.getMonth(), Number(post_message))
-    if (Number(target_date)) {
+    if (!Number(target_date)) {
       return false
     }
     //存在しない日付の場合(現在月と差分が生まれる場合false)
@@ -58,7 +62,7 @@ function isDatePattern(post_message: string) {
   //4桁の月日表記の場合
   if (post_message.match(/^\d{4}$/)) {
     const target_date = new Date(now.getFullYear(), Number(post_message.substring(0, 2)) - 1, Number(post_message.substring(2)))
-    if (Number(target_date)) {
+    if (!Number(target_date)) {
       return false
     }
     //存在しない日付の場合(年月が繰り上がりとうしている場合false)
