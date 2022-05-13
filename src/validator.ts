@@ -1,7 +1,6 @@
-/// <reference path="main.ts" />
-
 //export for test
 module.exports.isDatePattern = isDatePattern;
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from './constant';
 
 /**
  * 送られてきたメッセージのバリデートチェック
@@ -69,7 +68,7 @@ function isDatePattern(post_message: string) {
     return true
   }
 
-  if (Number((new Date(Number(post_message))))) {
+  if (Number((new Date(post_message)))) {
     return true
   }
 

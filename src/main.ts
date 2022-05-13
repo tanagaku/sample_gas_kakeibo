@@ -1,18 +1,9 @@
 /// <reference path="line_fetch.ts" />
-
-const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
-const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
-const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
-const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
-var LINE_URL = "https://api.line.me/v2/bot/message/reply"
-
-const CATEGORY_LIST = ['食費', '外食費', '日用品', 'ヘルスケア', '娯楽費', '電気代', 'ガス代', '水道代', '家賃', '入金', 'その他']
-const DAY_LIST = ['今日', '昨日', '一昨日']
-const PAYMENT_STATUS_LIST = ['共通財布', '精算済', '未精算']
-const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況']
-const DELETE = '削除'
-const ACCOUNT_LIST = ['今月', '先月', '残高']
-const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。'
+export const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+export const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
+export const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
+export const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
+export const LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 function doPost(e: any) {
 
