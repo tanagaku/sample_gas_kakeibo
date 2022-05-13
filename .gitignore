@@ -3,3 +3,5 @@
 creds.json
 node_modules
 .vscode
+coverage
+
