@@ -1,9 +1,13 @@
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from './constant';
+
+//export for test
+module.exports.isDatePattern = isDatePattern;
+module.exports.validateRegistMessage = validateRegistMessage;
+
 /**
  * 送られてきたメッセージのバリデートチェック
  */
-function validateRegistMessage(message_parameter) {
-  //debug
-  //message_parameter = ['食費','2000','2022/12/12','共通財布'];
+function validateRegistMessage(message_parameter: any[]): { result: boolean; message: string } {
 
   //message_parameterが指定の数かチェック
   if (message_parameter.length < 4) {
@@ -30,7 +34,7 @@ function validateRegistMessage(message_parameter) {
 }
 
 //日付入力パターン似合っているチェック
-function isDatePattern(post_message) {
+function isDatePattern(post_message: string) {
   if (!post_message) {
     return false
   }
@@ -39,11 +43,15 @@ function isDatePattern(post_message) {
     return true
   }
 
-  now = new Date()
+  const now = new Date()
   //1桁もしくは2桁の日付表記の場合
+  if (post_message == '0') {
+    return false
+  }
+
   if (post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)) {
-    target_date = new Date(now.getFullYear(), now.getMonth(), post_message)
-    if (isNaN(target_date)) {
+    const target_date = new Date(now.getFullYear(), now.getMonth(), Number(post_message))
+    if (!Number(target_date)) {
       return false
     }
     //存在しない日付の場合(現在月と差分が生まれる場合false)
@@ -55,18 +63,18 @@ function isDatePattern(post_message) {
 
   //4桁の月日表記の場合
   if (post_message.match(/^\d{4}$/)) {
-    target_date = new Date(now.getFullYear(), post_message.substring(0, 2) - 1, post_message.substring(2))
-    if (isNaN(target_date)) {
+    const target_date = new Date(now.getFullYear(), Number(post_message.substring(0, 2)) - 1, Number(post_message.substring(2)))
+    if (!Number(target_date)) {
       return false
     }
     //存在しない日付の場合(年月が繰り上がりとうしている場合false)
-    if (target_date.getFullYear() != now.getFullYear() || target_date.getMonth() + 1 != post_message.substring(0, 2)) {
+    if (target_date.getFullYear() != now.getFullYear() || target_date.getMonth() + 1 != Number(post_message.substring(0, 2))) {
       return false
     }
     return true
   }
 
-  if (post_message != 0 && !isNaN(new Date(post_message))) {
+  if (Number((new Date(post_message)))) {
     return true
   }
 

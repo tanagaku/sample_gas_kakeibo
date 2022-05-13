@@ -1,4 +1,4 @@
-name: CD (Build and Only Push to production)
+name: CI (Test Clasp Push)
 
 on:
   push:
@@ -7,7 +7,22 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16.x"
+      - name: Install Dependencies
+        run: npm install jest
+      - name: Run test
+        run: npx jest
+      - name: Coverage test
+        run: npx jest --coverage
+  clasp_push:
+    needs: test
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout

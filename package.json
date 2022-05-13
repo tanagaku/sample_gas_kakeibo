@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.47"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "jest": "^28.1.0",
+    "jsonc-parser": "^3.0.0",
+    "ts-jest": "^28.0.2"
+  }
+}

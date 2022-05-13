@@ -1,18 +1,10 @@
-const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
-const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
-const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
-const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
-var LINE_URL = "https://api.line.me/v2/bot/message/reply"
+const validator = require('./validator');
+const date_util = require('./date_util')
 
-const CATEGORY_LIST = ['食費', '外食費', '日用品', 'ヘルスケア', '娯楽費', '電気代', 'ガス代', '水道代', '家賃', '入金', 'その他']
-const DAY_LIST = ['今日', '昨日', '一昨日']
-const PAYMENT_STATUS_LIST = ['共通財布', '精算済', '未精算']
-const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況']
-const DELETE = '削除'
-const ACCOUNT_LIST = ['今月', '先月', '残高']
-const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。'
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, DELETE, ACCOUNT_LIST } from './constant';
 
-function doPost(e) {
+
+function doPost(e: any) {
 
   // メッセージをjsonパースして取得
   var json = JSON.parse(e.postData.getDataAsString())
@@ -27,7 +19,7 @@ function doPost(e) {
   }
 
   if (json.events[0].postback) {
-    postBackData = JSON.parse(json.events[0].postback.data)
+    const postBackData = JSON.parse(json.events[0].postback.data)
     doPostBackData(postBackData, replyToken)
     return
   }
@@ -52,7 +44,7 @@ function doPost(e) {
   }
 
   //menuメッセージが入力された場合用のメッセージを詰める
-  if (!isNaN(new Date(message_parameter[0])) || ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
+  if (!Number(message_parameter[0]) || ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
     console.log("reply menu message")
     //メッセージ送信
     sendTextMessage(setMenuMessage(message_parameter[0]), replyToken)
@@ -60,7 +52,7 @@ function doPost(e) {
 
   //メッセージのバリデートチェック
   console.log('validateMessage start. message_parameter:' + message_parameter)
-  validateResult = validateRegistMessage(message_parameter)
+  const validateResult = validator.validateRegistMessage(message_parameter)
   console.log('validateMessage end results:' + validateResult.result)
 
   if (!validateResult.result) {
@@ -70,11 +62,11 @@ function doPost(e) {
   }
 
   //購入日をyyyy/MM/dd形式にformat
-  var buy_date = setBuyDate(message_parameter[2])
+  var buy_date = date_util.setBuyDate(message_parameter[2])
   var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
   //年単位で記録するシートを分けているので振り分け
   var sheet_name = ''
-  if (buy_date.getFullYear != '2022') {
+  if (buy_date.getFullYear() != 2022) {
     sheet_name = '2022_List'
   } else {
     sheet_name = '2021_List'
@@ -82,7 +74,18 @@ function doPost(e) {
 
   //家計簿シートに登録
   console.log('regist sheet start')
+  if (SHEET_ID == null) {
+    console.error('failed to get spreadsheet')
+    return
+  }
+
   var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+
+  if (register_sheet == null) {
+    console.error('failed to get spreadsheet')
+    return
+  }
+
   var last_row = register_sheet.getLastRow() + 1;
   var user = getUserProfile(json.events[0].source.userId)
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
@@ -102,58 +105,17 @@ function doPost(e) {
 }
 
 //postBack時の処理
-function doPostBackData(postBackData, replyToken) {
+function doPostBackData(postBackData: { action: any; row: string; }, replyToken: any) {
   switch (postBackData.action) {
     case 'delete':
       console.log('delete record:' + postBackData.row)
-      deleteData(replyToken, postBackData.row)
+      deleteData(replyToken, Number(postBackData.row))
     default:
       console.error('Not assumed postData', postBackData.action)
   }
 }
 
-function setBuyDate(post_message) {
-  now = new Date()
-  switch (post_message) {
-    case '今日':
-      return now
-    case '昨日':
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
-    case '一昨日':
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2)
-  }
-
-  now = new Date()
-  //1桁もしくは2桁の日付表記の場合
-  if (post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)) {
-    return new Date(now.getFullYear(), now.getMonth(), post_message)
-  }
-
-  //4桁の月日表記の場合
-  if (post_message.match(/^\d{4}$/)) {
-    return new Date(now.getFullYear(), post_message.substring(0, 2) - 1, post_message.substring(2))
-  }
-
-  //mm/dd形式の場合
-  if (post_message.match(/^\d{1,2}\/\d{1,2}$/)) {
-    dateArray = post_message.split('/');
-    return new Date(now.getFullYear(), dateArray[0] - 1, dateArray[1])
-  }
-  return new Date(post_message)
-}
-
-function setHelpMessage(post_message) {
-  switch (post_message) {
-    case 'カテゴリ':
-      return 'カテゴリは、' + CATEGORY_LIST + 'のいずれかを入力してください。'
-    case '支払い状況':
-      return '支払い状況は、' + PAYMENT_STATUS_LIST + 'のいずれかを入力してください。'
-    case 'ヘルプ':
-      return HELP_MESSAGE
-  }
-}
-
-function setMenuMessage(post_message) {
+function setMenuMessage(post_message: any) {
 
   switch (post_message) {
     case '残高':
@@ -161,34 +123,43 @@ function setMenuMessage(post_message) {
     case '今月':
       return getBalance(new Date())
     case '先月':
-      date = new Date()
-      console.log(date)
-      return getBalance(new Date(date.getFullYear(), date.getMonth() - 1, 1))
+      const now = new Date()
+      console.log(now)
+      return getBalance(new Date(now.getFullYear(), now.getMonth() - 1, 1))
     default:
       return getBalance(new Date(post_message))
   }
 }
 
-function getBalance(date) {
+function getBalance(date: Date): string {
   //家計簿シートから情報取得
   console.log('get sheet start')
-  if (date.getFullYear < 2021) {
+  if (Number(date.getFullYear) < 2021) {
     console.log('out of range year:' + date.getFullYear)
     return ''
   }
 
-  sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
+  if (SHEET_ID == null) {
+    console.error('failed to get spreadsheet')
+    return ''
+  }
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
   //対象月の列を取得
-  row = date.getMonth() + 21
+  const row = date.getMonth() + 21
+  if (sheet == null) {
+    console.error('failed to get spreadsheet')
+    return ''
+  }
+
   //対象月の金額を取得
-  money_range = sheet.getRange(row, 3, 1, 13)
+  const money_range = sheet.getRange(row, 3, 1, 13)
 
   //返却値
-  return_message = date.getFullYear() + '/' + String(date.getMonth() + 1) + 'の残高は'
-  column = 3
+  let return_message = date.getFullYear() + '/' + String(date.getMonth() + 1) + 'の残高は'
+  let column = 3
   //取得したセルをループして返却値を追加
-  money_range.getValues().forEach(e => {
-    e.forEach(f => {
+  money_range.getValues().forEach((e: any[]) => {
+    e.forEach((f: string) => {
       return_message = return_message + '\n' + sheet.getRange(20, column).getValue() + ':' + f
       column++
     })
@@ -197,22 +168,41 @@ function getBalance(date) {
   return return_message
 }
 
+function setHelpMessage(post_message: any): string {
+  switch (post_message) {
+    case 'カテゴリ':
+      return 'カテゴリは、' + CATEGORY_LIST + 'のいずれかを入力してください。'
+    case '支払い状況':
+      return '支払い状況は、' + PAYMENT_STATUS_LIST + 'のいずれかを入力してください。'
+    case 'ヘルプ':
+      return HELP_MESSAGE
+  }
+  return ''
+}
+
 //削除メッセージ受信時
-function sendDeleteButton(replyToken) {
+function sendDeleteButton(replyToken: any) {
   console.log('send delete button message')
 
-  sheet_name = '2022_List'
+  const sheet_name = '2022_List'
+  if (SHEET_ID == null) {
+    console.error('failed to get spreadsheet')
+    return
+  }
   var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
-  lastRow = register_sheet.getLastRow()
+  if (register_sheet == null) {
+    console.error('failed to get spreadsheet')
+    return
+  }
+  const lastRow = register_sheet.getLastRow()
 
   const actions = []
   //3行分のデータを取得(ボタンテンプレートはMax4件まで)
-  for (i = 0; i < 3; i++) {
-    records = register_sheet.getRange(lastRow - i, 2, 1, 3).getValues().map(e => {
+  for (let i = 0; i < 3; i++) {
+    const records = register_sheet.getRange(lastRow - i, 2, 1, 3).getValues().map(e => {
       e[1] = e[1] + "円"
-      if (date = new Date(e[2])) {
-        e[2] = date.getMonth() + 1 + "/" + date.getDate()
-      }
+      const date = new Date(e[2])
+      e[2] = date.getMonth() + 1 + "/" + date.getDate()
       return e
     })
 
@@ -239,11 +229,19 @@ function sendDeleteButton(replyToken) {
   sendMessage(LineMessageObject, replyToken)
 }
 
-function deleteData(replyToken, row) {
+function deleteData(replyToken: any, row: number) {
 
-  sheet_name = '2022_List'
+  const sheet_name = '2022_List'
+  if (SHEET_ID == null) {
+    console.error('failed to get spreadsheet')
+    return
+  }
   var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
   //対象行の削除
+  if (sheet == null) {
+    console.error('failed to get spreadsheet')
+    return
+  }
   sheet.deleteRow(row)
 
   //メッセージ送信

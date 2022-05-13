@@ -1,7 +1,13 @@
+const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
+const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
+const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
+const LINE_URL = "https://api.line.me/v2/bot/message/reply"
+
 /**
  * Textメッセージを送信する
  */
-function sendTextMessage(post_message, replyToken) {
+function sendTextMessage(post_message: string, replyToken: any) {
   console.log('sendTextMessage:' + post_message)
 
   const messageObject = [{
@@ -13,7 +19,7 @@ function sendTextMessage(post_message, replyToken) {
 }
 
 //メッセージを送信する
-function sendMessage(messageObject, replyToken) {
+function sendMessage(messageObject: any, replyToken: any) {
   const replyHeaders = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + ACCESS_TOKEN
@@ -23,7 +29,8 @@ function sendMessage(messageObject, replyToken) {
     'replyToken': replyToken,
     'messages': messageObject
   };
-  const replyOptions = {
+
+  const replyOptions: any = {
     'method': 'POST',
     'headers': replyHeaders,
     'payload': JSON.stringify(replyBody)
@@ -33,12 +40,13 @@ function sendMessage(messageObject, replyToken) {
 }
 
 // profileを取得してくる関数
-function getUserProfile(user_id) {
+function getUserProfile(user_id: string) {
   var url = 'https://api.line.me/v2/bot/profile/' + user_id;
   var userProfile = UrlFetchApp.fetch(url, {
     'headers': {
       'Authorization': 'Bearer ' + ACCESS_TOKEN,
     },
   })
-  return JSON.parse(userProfile).displayName;
+
+  return JSON.parse(userProfile.getContentText()).displayName;
 }
