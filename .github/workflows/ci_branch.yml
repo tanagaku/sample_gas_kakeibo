@@ -15,9 +15,9 @@ jobs:
         with:
           node-version: "16.x"
       - name: Install Dependencies
-        run: npm install
+        run: npm install jest
       - name: Run test
-        run: npm jest
+        run: npx jest
   clasp_push:
     runs-on: ubuntu-latest
     timeout-minutes: 15
