@@ -1,4 +1,4 @@
-const validator = require('./validator');
+const validator = require('../validator');
 
 //validateRegistMessage Test
 test('正常系', () => {

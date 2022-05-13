@@ -1,6 +1,7 @@
 const validator = require('./validator');
+const date_util = require('./date_util')
 
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE_LIST, DELETE, ACCOUNT_LIST, HELP_MESSAGE } from './constant';
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, DELETE, ACCOUNT_LIST } from './constant';
 
 
 function doPost(e: any) {
@@ -61,7 +62,7 @@ function doPost(e: any) {
   }
 
   //購入日をyyyy/MM/dd形式にformat
-  var buy_date = setBuyDate(message_parameter[2])
+  var buy_date = date_util.setBuyDate(message_parameter[2])
   var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
   //年単位で記録するシートを分けているので振り分け
   var sheet_name = ''
@@ -112,48 +113,6 @@ function doPostBackData(postBackData: { action: any; row: string; }, replyToken:
     default:
       console.error('Not assumed postData', postBackData.action)
   }
-}
-
-function setBuyDate(post_message: string) {
-  const now = new Date()
-
-  switch (post_message) {
-    case '今日':
-      return now
-    case '昨日':
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
-    case '一昨日':
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2)
-  }
-
-  //1桁もしくは2桁の日付表記の場合
-  if (post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)) {
-    return new Date(now.getFullYear(), now.getMonth(), Number(post_message))
-  }
-
-  //4桁の月日表記の場合
-  if (post_message.match(/^\d{4}$/)) {
-    return new Date(now.getFullYear(), Number(post_message.substring(0, 2)) - 1, Number(post_message.substring(2)))
-  }
-
-  //mm/dd形式の場合
-  if (post_message.match(/^\d{1,2}\/\d{1,2}$/)) {
-    const dateArray = post_message.split('/');
-    return new Date(now.getFullYear(), Number(dateArray[0]) - 1, Number(dateArray[1]))
-  }
-  return new Date(post_message)
-}
-
-function setHelpMessage(post_message: any): string {
-  switch (post_message) {
-    case 'カテゴリ':
-      return 'カテゴリは、' + CATEGORY_LIST + 'のいずれかを入力してください。'
-    case '支払い状況':
-      return '支払い状況は、' + PAYMENT_STATUS_LIST + 'のいずれかを入力してください。'
-    case 'ヘルプ':
-      return HELP_MESSAGE
-  }
-  return ''
 }
 
 function setMenuMessage(post_message: any) {
@@ -207,6 +166,18 @@ function getBalance(date: Date): string {
   })
 
   return return_message
+}
+
+function setHelpMessage(post_message: any): string {
+  switch (post_message) {
+    case 'カテゴリ':
+      return 'カテゴリは、' + CATEGORY_LIST + 'のいずれかを入力してください。'
+    case '支払い状況':
+      return '支払い状況は、' + PAYMENT_STATUS_LIST + 'のいずれかを入力してください。'
+    case 'ヘルプ':
+      return HELP_MESSAGE
+  }
+  return ''
 }
 
 //削除メッセージ受信時
