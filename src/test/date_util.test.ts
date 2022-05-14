@@ -21,6 +21,11 @@ test('MMdd', () => {
   expect(date_util.setBuyDate(parameter))
     .toStrictEqual(new Date(now.getFullYear(), Number(parameter.substring(0, 2)) - 1, Number(parameter.substring(2))));
 });
+test('MM/dd', () => {
+  const parameter = '12/28'
+  expect(date_util.setBuyDate(parameter))
+    .toStrictEqual(new Date(now.getFullYear(), Number(parameter.substring(0, 2)) - 1, Number(parameter.substring(3))));
+});
 test('今日', () => {
   const parameter = '今日'
   expect(date_util.setBuyDate(parameter)).toStrictEqual(new Date());
