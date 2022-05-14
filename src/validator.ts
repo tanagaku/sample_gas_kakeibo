@@ -24,7 +24,7 @@ function validateRegistMessage(message_parameter: any[]): { result: boolean; mes
   }
   //3行目の情報チェック(購入日)
   if (!isDatePattern(message_parameter[2])) {
-    return { 'result': false, 'message': '3行目は、購入日(yyyy/MM/dd)を入力してください。' }
+    return { 'result': false, 'message': '3行目は、購入日を入力してください。' }
   }
   //4行目の情報チェック(支払い状況)
   if (!message_parameter[3] || !PAYMENT_STATUS_LIST.some(e => e.match(message_parameter[3]))) {
@@ -51,9 +51,7 @@ function isDatePattern(post_message: string) {
 
   if (post_message.match(/^[1-9]{1}$/) || post_message.match(/^\d{2}$/)) {
     const target_date = new Date(now.getFullYear(), now.getMonth(), Number(post_message))
-    if (!Number(target_date)) {
-      return false
-    }
+
     //存在しない日付の場合(現在月と差分が生まれる場合false)
     if (target_date.getMonth() != now.getMonth()) {
       return false
@@ -64,9 +62,7 @@ function isDatePattern(post_message: string) {
   //4桁の月日表記の場合
   if (post_message.match(/^\d{4}$/)) {
     const target_date = new Date(now.getFullYear(), Number(post_message.substring(0, 2)) - 1, Number(post_message.substring(2)))
-    if (!Number(target_date)) {
-      return false
-    }
+
     //存在しない日付の場合(年月が繰り上がりとうしている場合false)
     if (target_date.getFullYear() != now.getFullYear() || target_date.getMonth() + 1 != Number(post_message.substring(0, 2))) {
       return false
