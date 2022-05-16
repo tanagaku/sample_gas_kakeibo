@@ -5,6 +5,9 @@ on:
     branches:
       - "*"
   workflow_dispatch:
+env:
+  #URL for posting job results to slack
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 jobs:
   test:
     runs-on: ubuntu-latest
