@@ -20,6 +20,15 @@ jobs:
         run: npx jest
       - name: Coverage test
         run: npx jest --coverage
+      # 失敗時はこちらのステップが実行される
+      - name: Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2.0.2
+        if: failure()
+        env:
+          SLACK_CHANNEL: alert_ci
+          SLACK_TITLE: Test Failure
+          SLACK_COLOR: danger
+
   clasp_push:
     needs: test
     runs-on: ubuntu-latest
@@ -42,3 +51,19 @@ jobs:
       - name: Push
         run: |
           clasp push
+      # 成功時はこちらのステップが実行される
+      - name: Slack Notification on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.0.2
+        env:
+          SLACK_CHANNEL: alert_ci
+          SLACK_TITLE: Deploy Success
+          SLACK_COLOR: good
+      # 失敗時はこちらのステップが実行される
+      - name: Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2.0.2
+        if: failure()
+        env:
+          SLACK_CHANNEL: alert_ci
+          SLACK_TITLE: Deploy Failure
+          SLACK_COLOR: danger
