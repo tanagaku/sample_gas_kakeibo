@@ -28,7 +28,7 @@ test('MM/dd', () => {
 });
 test('今日', () => {
   const parameter = '今日'
-  expect(date_util.setBuyDate(parameter)).toStrictEqual(new Date());
+  expect(String(date_util.setBuyDate(parameter)).substring(0, 23)).toStrictEqual(String(new Date()).substring(0, 23));
 });
 test('昨日', () => {
   const parameter = '昨日'
