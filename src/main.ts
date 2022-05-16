@@ -14,7 +14,7 @@ function doPost(e: any) {
   var replyToken = json.events[0].replyToken;
   //トークンが取れなかったら終了
   if (typeof replyToken === 'undefined') {
-    console.log('fail to get reply token')
+    console.error('fail to get reply token')
     return;
   }
 
@@ -135,7 +135,7 @@ function getBalance(date: Date): string {
   //家計簿シートから情報取得
   console.log('get sheet start')
   if (Number(date.getFullYear) < 2021) {
-    console.log('out of range year:' + date.getFullYear)
+    console.warn('out of range year:' + date.getFullYear)
     return ''
   }
 
