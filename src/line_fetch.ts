@@ -1,14 +1,14 @@
-const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
-const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
-const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
-const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
-const LINE_URL = "https://api.line.me/v2/bot/message/reply"
+export const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+export const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
+export const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
+export const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
+export const LINE_URL = "https://api.line.me/v2/bot/message/reply"
 
 /**
  * Textメッセージを送信する
  */
-function sendTextMessage(post_message: string, replyToken: any) {
-  console.log('sendTextMessage:' + post_message)
+export function sendTextMessage(post_message: string, replyToken: any) {
+  console.info('sendTextMessage:' + post_message)
 
   const messageObject = [{
     'type': 'text',
@@ -19,7 +19,7 @@ function sendTextMessage(post_message: string, replyToken: any) {
 }
 
 //メッセージを送信する
-function sendMessage(messageObject: any, replyToken: any) {
+export function sendMessage(messageObject: any, replyToken: any) {
   const replyHeaders = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + ACCESS_TOKEN
@@ -40,7 +40,7 @@ function sendMessage(messageObject: any, replyToken: any) {
 }
 
 // profileを取得してくる関数
-function getUserProfile(user_id: string) {
+export function getUserProfile(user_id: string) {
   var url = 'https://api.line.me/v2/bot/profile/' + user_id;
   var userProfile = UrlFetchApp.fetch(url, {
     'headers': {

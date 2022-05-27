@@ -1,10 +1,6 @@
 import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE } from './constant';
 
-//export for test
-module.exports.setBuyDate = setBuyDate;
-
-
-function setBuyDate(post_message: string) {
+export function setBuyDate(post_message: string) {
   const now = new Date()
 
   switch (post_message) {
