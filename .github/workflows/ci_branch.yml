@@ -45,7 +45,6 @@ jobs:
           node-version: "16.x"
       - name: Install Clasp
         run: |
-          npm init -y
           npm install @google/clasp -g
           npm i -D typescript @types/node @types/google-apps-script
           npm i -D webpack webpack-cli ts-loader gas-webpack-plugin
