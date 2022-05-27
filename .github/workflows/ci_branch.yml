@@ -47,6 +47,8 @@ jobs:
         run: |
           npm init -y
           npm install @google/clasp -g
+          npm i -D typescript @types/node @types/google-apps-script
+          npm i -D webpack webpack-cli ts-loader gas-webpack-plugin
       - name: Create clasprc.json & crasp.json
         run: |
           echo \{\"scriptId\":\"${{ secrets.SCRIPT_ID}}\",\"rootDir\":\"./dist\"\,\"projectId\": \"${{ secrets.PROJECT_ID}}\"} > ~/.clasp.json
