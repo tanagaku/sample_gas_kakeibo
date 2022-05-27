@@ -1,4 +1,4 @@
-const date_util = require('../date_util');
+import * as date_util from '../date_util';
 
 //setBuyDate Test
 const now = new Date();

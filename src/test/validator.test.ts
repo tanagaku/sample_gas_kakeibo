@@ -1,4 +1,4 @@
-const validator = require('../validator');
+import * as validator from '../validator';
 import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from '../constant';
 
 //validateRegistMessage Test
@@ -50,7 +50,7 @@ test('日付リストの文字列の場合 true', () => {
   expect(validator.isDatePattern('今日')).toBe(true);
 });
 test('値がセットされていない場合 false', () => {
-  expect(validator.isDatePattern()).toBe(false);
+  expect(validator.isDatePattern("")).toBe(false);
 });
 test('2021/13/32 false', () => {
   expect(validator.isDatePattern('2021/13/32')).toBe(false);

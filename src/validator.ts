@@ -1,13 +1,10 @@
 import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from './constant';
 
-//export for test
-module.exports.isDatePattern = isDatePattern;
-module.exports.validateRegistMessage = validateRegistMessage;
 
 /**
  * 送られてきたメッセージのバリデートチェック
  */
-function validateRegistMessage(message_parameter: any[]): { result: boolean; message: string } {
+export function validateRegistMessage(message_parameter: any[]): { result: boolean; message: string } {
 
   //message_parameterが指定の数かチェック
   if (message_parameter.length < 4) {
@@ -34,7 +31,7 @@ function validateRegistMessage(message_parameter: any[]): { result: boolean; mes
 }
 
 //日付入力パターン似合っているチェック
-function isDatePattern(post_message: string) {
+export function isDatePattern(post_message: string) {
   if (!post_message) {
     return false
   }

@@ -1,14 +1,15 @@
-const validator = require('./validator');
-const date_util = require('./date_util')
+import * as validator from './validator';
+import * as date_util from './date_util';
+import * as line_fetch from './line_fetch';
 
 import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, DELETE, ACCOUNT_LIST } from './constant';
 
 
-function doPost(e: any) {
+export function doPost(e: any) {
 
   // メッセージをjsonパースして取得
   var json = JSON.parse(e.postData.getDataAsString())
-  console.log('doPost.event:' + e.postData.getDataAsString())
+  console.info('doPost.event:' + e.postData.getDataAsString())
 
   //返信用のトークン取得
   var replyToken = json.events[0].replyToken;
@@ -30,34 +31,34 @@ function doPost(e: any) {
 
   //helpメッセージが入力された場合用のメッセージを詰める
   if (HELP_MESSAGE_LIST.some(e => e.match(message_parameter[0]))) {
-    console.log("reply help message")
+    console.info("reply help message")
     //メッセージ送信
-    sendTextMessage(setHelpMessage(message_parameter[0]), replyToken)
+    line_fetch.sendTextMessage(setHelpMessage(message_parameter[0]), replyToken)
     return
   }
 
   //削除メッセージが送信されたとき
   if (DELETE.match(message_parameter[0])) {
-    console.log("reply delete button message")
+    console.info("reply delete button message")
     sendDeleteButton(replyToken)
     return
   }
 
   //menuメッセージが入力された場合用のメッセージを詰める
   if (!Number(message_parameter[0]) || ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
-    console.log("reply menu message")
+    console.info("reply menu message")
     //メッセージ送信
-    sendTextMessage(setMenuMessage(message_parameter[0]), replyToken)
+    line_fetch.sendTextMessage(setMenuMessage(message_parameter[0]), replyToken)
   }
 
   //メッセージのバリデートチェック
-  console.log('validateMessage start. message_parameter:' + message_parameter)
+  console.info('validateMessage start. message_parameter:' + message_parameter)
   const validateResult = validator.validateRegistMessage(message_parameter)
-  console.log('validateMessage end results:' + validateResult.result)
+  console.info('validateMessage end results:' + validateResult.result)
 
   if (!validateResult.result) {
     //メッセージ送信
-    sendTextMessage(validateResult.message, replyToken)
+    line_fetch.sendTextMessage(validateResult.message, replyToken)
     return
   }
 
@@ -73,13 +74,13 @@ function doPost(e: any) {
   }
 
   //家計簿シートに登録
-  console.log('regist sheet start')
-  if (SHEET_ID == null) {
+  console.info('regist sheet start')
+  if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
 
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(sheet_name);
 
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
@@ -87,7 +88,7 @@ function doPost(e: any) {
   }
 
   var last_row = register_sheet.getLastRow() + 1;
-  var user = getUserProfile(json.events[0].source.userId)
+  var user = line_fetch.getUserProfile(json.events[0].source.userId)
   var timestamp = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
 
   register_sheet.getRange(last_row, 1).setValue(timestamp)
@@ -101,14 +102,14 @@ function doPost(e: any) {
   register_sheet.getRange(last_row, 7).setValue(message_parameter[3])//支払い状況
 
   //メッセージ送信
-  sendTextMessage('登録完了', replyToken)
+  line_fetch.sendTextMessage('登録完了', replyToken)
 }
 
 //postBack時の処理
 function doPostBackData(postBackData: { action: any; row: string; }, replyToken: any) {
   switch (postBackData.action) {
     case 'delete':
-      console.log('delete record:' + postBackData.row)
+      console.info('delete record:' + postBackData.row)
       deleteData(replyToken, Number(postBackData.row))
     default:
       console.error('Not assumed postData', postBackData.action)
@@ -124,7 +125,7 @@ function setMenuMessage(post_message: any) {
       return getBalance(new Date())
     case '先月':
       const now = new Date()
-      console.log(now)
+      console.info(now)
       return getBalance(new Date(now.getFullYear(), now.getMonth() - 1, 1))
     default:
       return getBalance(new Date(post_message))
@@ -133,17 +134,17 @@ function setMenuMessage(post_message: any) {
 
 function getBalance(date: Date): string {
   //家計簿シートから情報取得
-  console.log('get sheet start')
+  console.info('get sheet start')
   if (Number(date.getFullYear) < 2021) {
     console.warn('out of range year:' + date.getFullYear)
     return ''
   }
 
-  if (SHEET_ID == null) {
+  if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return ''
   }
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
+  const sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(String(date.getFullYear()));
   //対象月の列を取得
   const row = date.getMonth() + 21
   if (sheet == null) {
@@ -182,14 +183,14 @@ function setHelpMessage(post_message: any): string {
 
 //削除メッセージ受信時
 function sendDeleteButton(replyToken: any) {
-  console.log('send delete button message')
+  console.info('send delete button message')
 
   const sheet_name = '2022_List'
-  if (SHEET_ID == null) {
+  if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(sheet_name);
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
     return
@@ -226,17 +227,17 @@ function sendDeleteButton(replyToken: any) {
     }
   }]
 
-  sendMessage(LineMessageObject, replyToken)
+  line_fetch.sendMessage(LineMessageObject, replyToken)
 }
 
 function deleteData(replyToken: any, row: number) {
 
   const sheet_name = '2022_List'
-  if (SHEET_ID == null) {
+  if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
-  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(sheet_name);
+  var sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(sheet_name);
   //対象行の削除
   if (sheet == null) {
     console.error('failed to get spreadsheet')
@@ -245,5 +246,5 @@ function deleteData(replyToken: any, row: number) {
   sheet.deleteRow(row)
 
   //メッセージ送信
-  sendTextMessage('削除完了', replyToken)
+  line_fetch.sendTextMessage('削除完了', replyToken)
 }
