@@ -214,6 +214,12 @@ function sendDeleteButton(replyToken: any) {
     )
   }
 
+  if (!actions.length) {
+    //メッセージ送信
+    line_fetch.sendTextMessage('削除対象のデータがありません', replyToken)
+    return
+  }
+
   const LineMessageObject = [{
     "type": "template",
     "altText": "This is a buttons template",
