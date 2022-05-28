@@ -184,7 +184,7 @@ function doPost(e) {
         return;
     }
     //menuメッセージが入力された場合用のメッセージを詰める
-    if (!Number(message_parameter[0]) || _constant__WEBPACK_IMPORTED_MODULE_3__.ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
+    if (_constant__WEBPACK_IMPORTED_MODULE_3__.ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
         console.info("reply menu message");
         //メッセージ送信
         _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendTextMessage(setMenuMessage(message_parameter[0]), replyToken);
