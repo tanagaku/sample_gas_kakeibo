@@ -31,11 +31,32 @@ jobs:
           SLACK_CHANNEL: alert_ci
           SLACK_TITLE: Test Failure
           SLACK_COLOR: danger
-
-  clasp_push:
+  commit:
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    outputs:
+      diffCount: ${{ steps.changes.outputs.count }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: |
+          npm i -D typescript @types/node @types/google-apps-script
+          npm i -D webpack webpack-cli ts-loader gas-webpack-plugin
+          npm run build
+      - name: Count changes
+        id: changes
+        run: echo "::set-output name=count::$(git diff --name-only | wc -l)"
+      - name: Update openapi.json
+        run: |
+          git add --update
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -m "Automatin npm build updte"
+          git push
+  clasp_push:
+    needs: commit
+    runs-on: ubuntu-latest
+    if: ${{ needs.commit.outputs.diffCount }} > 0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
