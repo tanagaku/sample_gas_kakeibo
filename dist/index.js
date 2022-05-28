@@ -342,12 +342,11 @@ function sendDeleteButton(replyToken) {
     _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendMessage(LineMessageObject, replyToken);
 }
 function deleteData(replyToken, row) {
-    const SHEET_NAME = '2022_List';
     if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(SHEET_NAME);
+    var sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
     //対象行の削除
     if (sheet == null) {
         console.error('failed to get spreadsheet');
