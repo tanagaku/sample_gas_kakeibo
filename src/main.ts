@@ -2,7 +2,7 @@ import * as validator from './validator';
 import * as date_util from './date_util';
 import * as line_fetch from './line_fetch';
 
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, SHEET_NAME, DELETE, ACCOUNT_LIST, SHEET_ID } from './constant';
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, TOTAL_SHEET_NAME, DELETE, ACCOUNT_LIST, SHEET_ID } from './constant';
 
 
 export function doPost(e: any) {
@@ -73,7 +73,7 @@ export function doPost(e: any) {
     return
   }
 
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TOTAL_SHEET_NAME);
 
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
@@ -182,7 +182,7 @@ function sendDeleteButton(replyToken: any) {
     console.error('failed to get spreadsheet')
     return
   }
-  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TOTAL_SHEET_NAME);
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
     return
@@ -240,7 +240,7 @@ function deleteData(replyToken: any, row: number) {
     console.error('failed to get spreadsheet')
     return
   }
-  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TOTAL_SHEET_NAME);
   //対象行の削除
   if (sheet == null) {
     console.error('failed to get spreadsheet')
