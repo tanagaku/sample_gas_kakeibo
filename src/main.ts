@@ -2,7 +2,7 @@ import * as validator from './validator';
 import * as date_util from './date_util';
 import * as line_fetch from './line_fetch';
 
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, SHEET_NAME, DELETE, ACCOUNT_LIST } from './constant';
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, TOTAL_SHEET_NAME, DELETE, ACCOUNT_LIST, SHEET_ID } from './constant';
 
 
 export function doPost(e: any) {
@@ -68,12 +68,12 @@ export function doPost(e: any) {
 
   //家計簿シートに登録
   console.info('regist sheet start')
-  if (line_fetch.SHEET_ID == null) {
+  if (SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
 
-  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TOTAL_SHEET_NAME);
 
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
@@ -133,11 +133,11 @@ function getBalance(date: Date): string {
     return ''
   }
 
-  if (line_fetch.SHEET_ID == null) {
+  if (SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return ''
   }
-  const sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(String(date.getFullYear()));
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(String(date.getFullYear()));
   //対象月の列を取得
   const row = date.getMonth() + 21
   if (sheet == null) {
@@ -178,11 +178,11 @@ function setHelpMessage(post_message: any): string {
 function sendDeleteButton(replyToken: any) {
   console.info('send delete button message')
 
-  if (line_fetch.SHEET_ID == null) {
+  if (SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
-  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
+  var register_sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TOTAL_SHEET_NAME);
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
     return
@@ -191,7 +191,13 @@ function sendDeleteButton(replyToken: any) {
 
   const actions = []
   //3行分のデータを取得(ボタンテンプレートはMax4件まで)
-  for (let i = 0; i < 3; i++) {
+  var count = 3
+  if (lastRow < 3) {
+    //1行目はヘッダーなので除外
+    count = lastRow - 1
+  }
+
+  for (let i = 0; i < count; i++) {
     const records = register_sheet.getRange(lastRow - i, 2, 1, 3).getValues().map(e => {
       e[1] = e[1] + "円"
       const date = new Date(e[2])
@@ -206,6 +212,12 @@ function sendDeleteButton(replyToken: any) {
         "data": JSON.stringify({ "action": "delete", "row": lastRow - i })
       }
     )
+  }
+
+  if (!actions.length) {
+    //メッセージ送信
+    line_fetch.sendTextMessage('削除対象のデータがありません', replyToken)
+    return
   }
 
   const LineMessageObject = [{
@@ -224,12 +236,11 @@ function sendDeleteButton(replyToken: any) {
 
 function deleteData(replyToken: any, row: number) {
 
-  const SHEET_NAME = '2022_List'
-  if (line_fetch.SHEET_ID == null) {
+  if (SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
-  var sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
+  var sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TOTAL_SHEET_NAME);
   //対象行の削除
   if (sheet == null) {
     console.error('failed to get spreadsheet')

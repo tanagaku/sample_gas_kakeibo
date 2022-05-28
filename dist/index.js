@@ -11,23 +11,57 @@ function doPost() {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ACCESS_TOKEN": () => (/* binding */ ACCESS_TOKEN),
 /* harmony export */   "ACCOUNT_LIST": () => (/* binding */ ACCOUNT_LIST),
 /* harmony export */   "CATEGORY_LIST": () => (/* binding */ CATEGORY_LIST),
 /* harmony export */   "DAY_LIST": () => (/* binding */ DAY_LIST),
 /* harmony export */   "DELETE": () => (/* binding */ DELETE),
 /* harmony export */   "HELP_MESSAGE": () => (/* binding */ HELP_MESSAGE),
 /* harmony export */   "HELP_MESSAGE_LIST": () => (/* binding */ HELP_MESSAGE_LIST),
+/* harmony export */   "LINE_URL": () => (/* binding */ LINE_URL),
 /* harmony export */   "PAYMENT_STATUS_LIST": () => (/* binding */ PAYMENT_STATUS_LIST),
-/* harmony export */   "SHEET_NAME": () => (/* binding */ SHEET_NAME)
+/* harmony export */   "PROPERTY_SHEET_NAME": () => (/* binding */ PROPERTY_SHEET_NAME),
+/* harmony export */   "SCRIPT_PROPERTIES": () => (/* binding */ SCRIPT_PROPERTIES),
+/* harmony export */   "SHEET_ID": () => (/* binding */ SHEET_ID),
+/* harmony export */   "SLACK_WEBHOOK_URL": () => (/* binding */ SLACK_WEBHOOK_URL),
+/* harmony export */   "TOTAL_SHEET_NAME": () => (/* binding */ TOTAL_SHEET_NAME),
+/* harmony export */   "getProperties": () => (/* binding */ getProperties)
 /* harmony export */ });
-const CATEGORY_LIST = ['食費', '外食費', '日用品', 'ヘルスケア', '娯楽費', '電気代', 'ガス代', '水道代', '家賃', '入金', 'その他'];
+const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL");
+const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN");
+const LINE_URL = "https://api.line.me/v2/bot/message/reply";
+const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID");
 const DAY_LIST = ['今日', '昨日', '一昨日'];
-const PAYMENT_STATUS_LIST = ['共通財布', '精算済', '未精算'];
 const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況'];
 const DELETE = '削除';
-const SHEET_NAME = 'List';
+const TOTAL_SHEET_NAME = 'List';
+const PROPERTY_SHEET_NAME = 'Category';
 const ACCOUNT_LIST = ['今月', '先月', '残高'];
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。';
+const CATEGORY_LIST = getProperties(1);
+const PAYMENT_STATUS_LIST = getProperties(2);
+function getProperties(row) {
+    const categories = [];
+    if (SHEET_ID == null) {
+        console.error('failed to get spreadsheet');
+        return categories;
+    }
+    var sheets = SpreadsheetApp.openById(SHEET_ID).getSheetByName(PROPERTY_SHEET_NAME);
+    if (sheets == null) {
+        console.error('failed to get spreadsheet');
+        return categories;
+    }
+    const lastRow = sheets.getLastRow();
+    for (let i = 2; i < lastRow; i++) {
+        const record = sheets.getRange(i, row).getValue();
+        if (!record) {
+            break;
+        }
+        categories.push(record);
+    }
+    return categories;
+}
 
 
 /***/ }),
@@ -79,20 +113,12 @@ function setBuyDate(post_message) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ACCESS_TOKEN": () => (/* binding */ ACCESS_TOKEN),
-/* harmony export */   "LINE_URL": () => (/* binding */ LINE_URL),
-/* harmony export */   "SCRIPT_PROPERTIES": () => (/* binding */ SCRIPT_PROPERTIES),
-/* harmony export */   "SHEET_ID": () => (/* binding */ SHEET_ID),
-/* harmony export */   "SLACK_WEBHOOK_URL": () => (/* binding */ SLACK_WEBHOOK_URL),
 /* harmony export */   "getUserProfile": () => (/* binding */ getUserProfile),
 /* harmony export */   "sendMessage": () => (/* binding */ sendMessage),
 /* harmony export */   "sendTextMessage": () => (/* binding */ sendTextMessage)
 /* harmony export */ });
-const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
-const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL");
-const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID");
-const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN");
-const LINE_URL = "https://api.line.me/v2/bot/message/reply";
+/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant */ "./src/constant.ts");
+
 /**
  * Textメッセージを送信する
  */
@@ -108,7 +134,7 @@ function sendTextMessage(post_message, replyToken) {
 function sendMessage(messageObject, replyToken) {
     const replyHeaders = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + ACCESS_TOKEN
+        'Authorization': 'Bearer ' + _constant__WEBPACK_IMPORTED_MODULE_0__.ACCESS_TOKEN
     };
     const replyBody = {
         'replyToken': replyToken,
@@ -119,14 +145,14 @@ function sendMessage(messageObject, replyToken) {
         'headers': replyHeaders,
         'payload': JSON.stringify(replyBody)
     };
-    UrlFetchApp.fetch(LINE_URL, replyOptions);
+    UrlFetchApp.fetch(_constant__WEBPACK_IMPORTED_MODULE_0__.LINE_URL, replyOptions);
 }
 // profileを取得してくる関数
 function getUserProfile(user_id) {
     var url = 'https://api.line.me/v2/bot/profile/' + user_id;
     var userProfile = UrlFetchApp.fetch(url, {
         'headers': {
-            'Authorization': 'Bearer ' + ACCESS_TOKEN,
+            'Authorization': 'Bearer ' + _constant__WEBPACK_IMPORTED_MODULE_0__.ACCESS_TOKEN,
         },
     });
     return JSON.parse(userProfile.getContentText()).displayName;
@@ -205,11 +231,11 @@ function doPost(e) {
     var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
     //家計簿シートに登録
     console.info('regist sheet start');
-    if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
+    if (_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var register_sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
+    var register_sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.TOTAL_SHEET_NAME);
     if (register_sheet == null) {
         console.error('failed to get spreadsheet');
         return;
@@ -260,11 +286,11 @@ function getBalance(date) {
         console.warn('out of range year:' + date.getFullYear);
         return '';
     }
-    if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
+    if (_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return '';
     }
-    const sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(String(date.getFullYear()));
+    const sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(String(date.getFullYear()));
     //対象月の列を取得
     const row = date.getMonth() + 21;
     if (sheet == null) {
@@ -299,11 +325,11 @@ function setHelpMessage(post_message) {
 //削除メッセージ受信時
 function sendDeleteButton(replyToken) {
     console.info('send delete button message');
-    if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
+    if (_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var register_sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
+    var register_sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.TOTAL_SHEET_NAME);
     if (register_sheet == null) {
         console.error('failed to get spreadsheet');
         return;
@@ -311,7 +337,12 @@ function sendDeleteButton(replyToken) {
     const lastRow = register_sheet.getLastRow();
     const actions = [];
     //3行分のデータを取得(ボタンテンプレートはMax4件まで)
-    for (let i = 0; i < 3; i++) {
+    var count = 3;
+    if (lastRow < 3) {
+        //1行目はヘッダーなので除外
+        count = lastRow - 1;
+    }
+    for (let i = 0; i < count; i++) {
         const records = register_sheet.getRange(lastRow - i, 2, 1, 3).getValues().map(e => {
             e[1] = e[1] + "円";
             const date = new Date(e[2]);
@@ -323,6 +354,11 @@ function sendDeleteButton(replyToken) {
             "label": records.join(","),
             "data": JSON.stringify({ "action": "delete", "row": lastRow - i })
         });
+    }
+    if (!actions.length) {
+        //メッセージ送信
+        _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendTextMessage('削除対象のデータがありません', replyToken);
+        return;
     }
     const LineMessageObject = [{
             "type": "template",
@@ -337,12 +373,11 @@ function sendDeleteButton(replyToken) {
     _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendMessage(LineMessageObject, replyToken);
 }
 function deleteData(replyToken, row) {
-    const SHEET_NAME = '2022_List';
-    if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
+    if (_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(SHEET_NAME);
+    var sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.TOTAL_SHEET_NAME);
     //対象行の削除
     if (sheet == null) {
         console.error('failed to get spreadsheet');
