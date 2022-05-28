@@ -1,9 +1,4 @@
-export const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
-export const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
-export const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
-export const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
-export const LINE_URL = "https://api.line.me/v2/bot/message/reply"
-
+import { ACCESS_TOKEN, LINE_URL } from './constant';
 /**
  * Textメッセージを送信する
  */

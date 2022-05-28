@@ -1,5 +1,10 @@
 import * as line_fetch from './line_fetch';
 
+export const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+export const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL")
+export const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN")
+export const LINE_URL = "https://api.line.me/v2/bot/message/reply"
+export const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID")
 export const CATEGORY_LIST = getProperties(1)
 export const DAY_LIST = ['今日', '昨日', '一昨日']
 export const PAYMENT_STATUS_LIST = getProperties(2)
@@ -13,12 +18,12 @@ export function getProperties(row: number): Array<string> {
 
   const categories: string[] = []
 
-  if (line_fetch.SHEET_ID == null) {
+  if (SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return categories
   }
 
-  var sheets = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
+  var sheets = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
   if (sheets == null) {
     console.error('failed to get spreadsheet')
     return categories
