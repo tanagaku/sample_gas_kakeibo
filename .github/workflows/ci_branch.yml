@@ -46,7 +46,7 @@ jobs:
       - name: Count changes
         id: changes
         run: echo "::set-output name=count::$(git diff --name-only | wc -l)"
-      - name: Update openapi.json
+      - name: Commit & Push
         if: steps.changes.outputs.count > 0
         run: |
           git add --update
@@ -67,6 +67,7 @@ jobs:
           node-version: "16.x"
       - name: Install Clasp
         run: |
+          echo ${{ needs.commit.outputs.diffCount }}
           npm install @google/clasp -g
           npm i -D typescript @types/node @types/google-apps-script
           npm i -D webpack webpack-cli ts-loader gas-webpack-plugin
