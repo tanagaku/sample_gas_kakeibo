@@ -18,16 +18,41 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "HELP_MESSAGE": () => (/* binding */ HELP_MESSAGE),
 /* harmony export */   "HELP_MESSAGE_LIST": () => (/* binding */ HELP_MESSAGE_LIST),
 /* harmony export */   "PAYMENT_STATUS_LIST": () => (/* binding */ PAYMENT_STATUS_LIST),
-/* harmony export */   "SHEET_NAME": () => (/* binding */ SHEET_NAME)
+/* harmony export */   "SHEET_NAME": () => (/* binding */ SHEET_NAME),
+/* harmony export */   "getProperties": () => (/* binding */ getProperties)
 /* harmony export */ });
-const CATEGORY_LIST = ['食費', '外食費', '日用品', 'ヘルスケア', '娯楽費', '電気代', 'ガス代', '水道代', '家賃', '入金', 'その他'];
+/* harmony import */ var _line_fetch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./line_fetch */ "./src/line_fetch.ts");
+
+const CATEGORY_LIST = getProperties(1);
 const DAY_LIST = ['今日', '昨日', '一昨日'];
-const PAYMENT_STATUS_LIST = ['共通財布', '精算済', '未精算'];
+const PAYMENT_STATUS_LIST = getProperties(2);
 const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況'];
 const DELETE = '削除';
 const SHEET_NAME = 'List';
 const ACCOUNT_LIST = ['今月', '先月', '残高'];
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。';
+//削除メッセージ受信時
+function getProperties(row) {
+    const categories = [];
+    if (_line_fetch__WEBPACK_IMPORTED_MODULE_0__.SHEET_ID == null) {
+        console.error('failed to get spreadsheet');
+        return categories;
+    }
+    var sheets = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_0__.SHEET_ID).getSheetByName(SHEET_NAME);
+    if (sheets == null) {
+        console.error('failed to get spreadsheet');
+        return categories;
+    }
+    const lastRow = sheets.getLastRow();
+    for (let i = 1; i < lastRow; i++) {
+        const record = sheets.getRange(i, row).getValue();
+        if (!record) {
+            break;
+        }
+        categories.push(record);
+    }
+    return categories;
+}
 
 
 /***/ }),
