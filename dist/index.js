@@ -17,13 +17,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DELETE": () => (/* binding */ DELETE),
 /* harmony export */   "HELP_MESSAGE": () => (/* binding */ HELP_MESSAGE),
 /* harmony export */   "HELP_MESSAGE_LIST": () => (/* binding */ HELP_MESSAGE_LIST),
-/* harmony export */   "PAYMENT_STATUS_LIST": () => (/* binding */ PAYMENT_STATUS_LIST)
+/* harmony export */   "PAYMENT_STATUS_LIST": () => (/* binding */ PAYMENT_STATUS_LIST),
+/* harmony export */   "SHEET_NAME": () => (/* binding */ SHEET_NAME)
 /* harmony export */ });
 const CATEGORY_LIST = ['食費', '外食費', '日用品', 'ヘルスケア', '娯楽費', '電気代', 'ガス代', '水道代', '家賃', '入金', 'その他'];
 const DAY_LIST = ['今日', '昨日', '一昨日'];
 const PAYMENT_STATUS_LIST = ['共通財布', '精算済', '未精算'];
 const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況'];
 const DELETE = '削除';
+const SHEET_NAME = 'List';
 const ACCOUNT_LIST = ['今月', '先月', '残高'];
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。';
 
@@ -184,7 +186,7 @@ function doPost(e) {
         return;
     }
     //menuメッセージが入力された場合用のメッセージを詰める
-    if (!Number(message_parameter[0]) || _constant__WEBPACK_IMPORTED_MODULE_3__.ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
+    if (_constant__WEBPACK_IMPORTED_MODULE_3__.ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
         console.info("reply menu message");
         //メッセージ送信
         _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendTextMessage(setMenuMessage(message_parameter[0]), replyToken);
@@ -201,21 +203,13 @@ function doPost(e) {
     //購入日をyyyy/MM/dd形式にformat
     var buy_date = _date_util__WEBPACK_IMPORTED_MODULE_1__.setBuyDate(message_parameter[2]);
     var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
-    //年単位で記録するシートを分けているので振り分け
-    var sheet_name = '';
-    if (buy_date.getFullYear() != 2022) {
-        sheet_name = '2022_List';
-    }
-    else {
-        sheet_name = '2021_List';
-    }
     //家計簿シートに登録
     console.info('regist sheet start');
     if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var register_sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(sheet_name);
+    var register_sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
     if (register_sheet == null) {
         console.error('failed to get spreadsheet');
         return;
@@ -305,12 +299,11 @@ function setHelpMessage(post_message) {
 //削除メッセージ受信時
 function sendDeleteButton(replyToken) {
     console.info('send delete button message');
-    const sheet_name = '2022_List';
     if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var register_sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(sheet_name);
+    var register_sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
     if (register_sheet == null) {
         console.error('failed to get spreadsheet');
         return;
@@ -344,12 +337,12 @@ function sendDeleteButton(replyToken) {
     _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendMessage(LineMessageObject, replyToken);
 }
 function deleteData(replyToken, row) {
-    const sheet_name = '2022_List';
+    const SHEET_NAME = '2022_List';
     if (_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID == null) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(sheet_name);
+    var sheet = SpreadsheetApp.openById(_line_fetch__WEBPACK_IMPORTED_MODULE_2__.SHEET_ID).getSheetByName(SHEET_NAME);
     //対象行の削除
     if (sheet == null) {
         console.error('failed to get spreadsheet');
