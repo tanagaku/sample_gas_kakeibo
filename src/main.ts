@@ -230,7 +230,6 @@ function sendDeleteButton(replyToken: any) {
 
 function deleteData(replyToken: any, row: number) {
 
-  const SHEET_NAME = '2022_List'
   if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
