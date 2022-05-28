@@ -11,7 +11,7 @@ export const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3�
 
 
 //削除メッセージ受信時
-function getProperties(row: number) {
+export function getProperties(row: number): Array<string> {
 
   const categories: string[] = []
 
@@ -31,7 +31,7 @@ function getProperties(row: number) {
   for (let i = 1; i < lastRow; i++) {
     const record = sheets.getRange(i, row).getValue()
     if (!record) {
-      return
+      break
     }
     categories.push(record)
   }
