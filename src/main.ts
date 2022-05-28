@@ -2,7 +2,7 @@ import * as validator from './validator';
 import * as date_util from './date_util';
 import * as line_fetch from './line_fetch';
 
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, DELETE, ACCOUNT_LIST } from './constant';
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, SHEET_NAME, DELETE, ACCOUNT_LIST } from './constant';
 
 
 export function doPost(e: any) {
@@ -65,7 +65,6 @@ export function doPost(e: any) {
   //購入日をyyyy/MM/dd形式にformat
   var buy_date = date_util.setBuyDate(message_parameter[2])
   var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
-  var sheet_name = 'List'
 
   //家計簿シートに登録
   console.info('regist sheet start')
@@ -74,7 +73,7 @@ export function doPost(e: any) {
     return
   }
 
-  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
 
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
@@ -179,12 +178,11 @@ function setHelpMessage(post_message: any): string {
 function sendDeleteButton(replyToken: any) {
   console.info('send delete button message')
 
-  const sheet_name = '2022_List'
   if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
-  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(sheet_name);
+  var register_sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
   if (register_sheet == null) {
     console.error('failed to get spreadsheet')
     return
@@ -226,12 +224,12 @@ function sendDeleteButton(replyToken: any) {
 
 function deleteData(replyToken: any, row: number) {
 
-  const sheet_name = '2022_List'
+  const SHEET_NAME = '2022_List'
   if (line_fetch.SHEET_ID == null) {
     console.error('failed to get spreadsheet')
     return
   }
-  var sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(sheet_name);
+  var sheet = SpreadsheetApp.openById(line_fetch.SHEET_ID).getSheetByName(SHEET_NAME);
   //対象行の削除
   if (sheet == null) {
     console.error('failed to get spreadsheet')
