@@ -20,10 +20,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "HELP_MESSAGE_LIST": () => (/* binding */ HELP_MESSAGE_LIST),
 /* harmony export */   "LINE_URL": () => (/* binding */ LINE_URL),
 /* harmony export */   "PAYMENT_STATUS_LIST": () => (/* binding */ PAYMENT_STATUS_LIST),
+/* harmony export */   "PROPERTY_SHEET_NAME": () => (/* binding */ PROPERTY_SHEET_NAME),
 /* harmony export */   "SCRIPT_PROPERTIES": () => (/* binding */ SCRIPT_PROPERTIES),
 /* harmony export */   "SHEET_ID": () => (/* binding */ SHEET_ID),
-/* harmony export */   "SHEET_NAME": () => (/* binding */ SHEET_NAME),
 /* harmony export */   "SLACK_WEBHOOK_URL": () => (/* binding */ SLACK_WEBHOOK_URL),
+/* harmony export */   "TOTAL_SHEET_NAME": () => (/* binding */ TOTAL_SHEET_NAME),
 /* harmony export */   "getProperties": () => (/* binding */ getProperties)
 /* harmony export */ });
 const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
@@ -36,7 +37,8 @@ const DAY_LIST = ['今日', '昨日', '一昨日'];
 const PAYMENT_STATUS_LIST = getProperties(2);
 const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況'];
 const DELETE = '削除';
-const SHEET_NAME = 'List';
+const TOTAL_SHEET_NAME = 'List';
+const PROPERTY_SHEET_NAME = 'Category';
 const ACCOUNT_LIST = ['今月', '先月', '残高'];
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。';
 function getProperties(row) {
@@ -45,7 +47,7 @@ function getProperties(row) {
         console.error('failed to get spreadsheet');
         return categories;
     }
-    var sheets = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+    var sheets = SpreadsheetApp.openById(SHEET_ID).getSheetByName(PROPERTY_SHEET_NAME);
     if (sheets == null) {
         console.error('failed to get spreadsheet');
         return categories;
@@ -233,7 +235,7 @@ function doPost(e) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var register_sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
+    var register_sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.TOTAL_SHEET_NAME);
     if (register_sheet == null) {
         console.error('failed to get spreadsheet');
         return;
@@ -327,7 +329,7 @@ function sendDeleteButton(replyToken) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var register_sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
+    var register_sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.TOTAL_SHEET_NAME);
     if (register_sheet == null) {
         console.error('failed to get spreadsheet');
         return;
@@ -375,7 +377,7 @@ function deleteData(replyToken, row) {
         console.error('failed to get spreadsheet');
         return;
     }
-    var sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_NAME);
+    var sheet = SpreadsheetApp.openById(_constant__WEBPACK_IMPORTED_MODULE_3__.SHEET_ID).getSheetByName(_constant__WEBPACK_IMPORTED_MODULE_3__.TOTAL_SHEET_NAME);
     //対象行の削除
     if (sheet == null) {
         console.error('failed to get spreadsheet');
