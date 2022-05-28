@@ -32,15 +32,15 @@ const SLACK_WEBHOOK_URL = SCRIPT_PROPERTIES.getProperty("SLACK_WEBHOOK_URL");
 const ACCESS_TOKEN = SCRIPT_PROPERTIES.getProperty("ACCESS_TOKEN");
 const LINE_URL = "https://api.line.me/v2/bot/message/reply";
 const SHEET_ID = SCRIPT_PROPERTIES.getProperty("SHEET_ID");
-const CATEGORY_LIST = getProperties(1);
 const DAY_LIST = ['今日', '昨日', '一昨日'];
-const PAYMENT_STATUS_LIST = getProperties(2);
 const HELP_MESSAGE_LIST = ['ヘルプ', 'カテゴリ', '支払い状況'];
 const DELETE = '削除';
 const TOTAL_SHEET_NAME = 'List';
 const PROPERTY_SHEET_NAME = 'Category';
 const ACCOUNT_LIST = ['今月', '先月', '残高'];
 const HELP_MESSAGE = '入力は\n1行目:カテゴリ\n2行目:金額\n3行目:購入日\n4行目:支払い状況\nを入力してください。\n残高確認は\n' + ACCOUNT_LIST + ',指定したい年月日(yyyy/MM/dd)\nを入力してください。';
+const CATEGORY_LIST = getProperties(1);
+const PAYMENT_STATUS_LIST = getProperties(2);
 function getProperties(row) {
     const categories = [];
     if (SHEET_ID == null) {
