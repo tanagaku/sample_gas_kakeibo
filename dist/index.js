@@ -329,6 +329,11 @@ function sendDeleteButton(replyToken) {
             "data": JSON.stringify({ "action": "delete", "row": lastRow - i })
         });
     }
+    if (!actions.length) {
+        //メッセージ送信
+        _line_fetch__WEBPACK_IMPORTED_MODULE_2__.sendTextMessage('削除対象のデータがありません', replyToken);
+        return;
+    }
     const LineMessageObject = [{
             "type": "template",
             "altText": "This is a buttons template",
