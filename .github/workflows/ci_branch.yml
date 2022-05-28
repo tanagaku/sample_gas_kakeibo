@@ -57,7 +57,7 @@ jobs:
   clasp_push:
     needs: commit
     runs-on: ubuntu-latest
-    if: ${{ needs.commit.outputs.diffCount }} > 0
+    if: ${{ needs.commit.outputs.diffCount > 0 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -67,7 +67,6 @@ jobs:
           node-version: "16.x"
       - name: Install Clasp
         run: |
-          echo ${{ needs.commit.outputs.diffCount }}
           npm install @google/clasp -g
           npm i -D typescript @types/node @types/google-apps-script
           npm i -D webpack webpack-cli ts-loader gas-webpack-plugin
