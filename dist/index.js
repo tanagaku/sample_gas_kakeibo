@@ -53,7 +53,7 @@ function getProperties(row) {
         return categories;
     }
     const lastRow = sheets.getLastRow();
-    for (let i = 1; i < lastRow; i++) {
+    for (let i = 2; i < lastRow; i++) {
         const record = sheets.getRange(i, row).getValue();
         if (!record) {
             break;
