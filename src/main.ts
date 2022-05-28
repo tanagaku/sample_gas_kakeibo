@@ -191,7 +191,13 @@ function sendDeleteButton(replyToken: any) {
 
   const actions = []
   //3行分のデータを取得(ボタンテンプレートはMax4件まで)
-  for (let i = 0; i < 3; i++) {
+  var count = 3
+  if (lastRow < 3) {
+    //1行目はヘッダーなので除外
+    count = lastRow - 1
+  }
+
+  for (let i = 0; i < count; i++) {
     const records = register_sheet.getRange(lastRow - i, 2, 1, 3).getValues().map(e => {
       e[1] = e[1] + "円"
       const date = new Date(e[2])
