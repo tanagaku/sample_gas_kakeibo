@@ -47,6 +47,7 @@ jobs:
         id: changes
         run: echo "::set-output name=count::$(git diff --name-only | wc -l)"
       - name: Update openapi.json
+        if: steps.changes.outputs.count > 0
         run: |
           git add --update
           git config user.name github-actions
