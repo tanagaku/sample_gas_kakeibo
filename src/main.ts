@@ -45,7 +45,7 @@ export function doPost(e: any) {
   }
 
   //menuメッセージが入力された場合用のメッセージを詰める
-  if (!Number(message_parameter[0]) || ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
+  if (ACCOUNT_LIST.some(e => e.match(message_parameter[0]))) {
     console.info("reply menu message")
     //メッセージ送信
     line_fetch.sendTextMessage(setMenuMessage(message_parameter[0]), replyToken)
