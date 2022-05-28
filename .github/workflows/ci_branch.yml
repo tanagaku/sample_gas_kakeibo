@@ -49,7 +49,7 @@ jobs:
       - name: Commit & Push
         if: steps.changes.outputs.count > 0
         run: |
-          git add --update
+          git add .
           git config user.name github-actions
           git config user.email github-actions@github.com
           git commit -m "Automatin npm build updte"
