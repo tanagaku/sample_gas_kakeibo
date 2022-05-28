@@ -65,13 +65,7 @@ export function doPost(e: any) {
   //購入日をyyyy/MM/dd形式にformat
   var buy_date = date_util.setBuyDate(message_parameter[2])
   var buy_date_str = Utilities.formatDate(buy_date, 'JST', 'yyyy/MM/dd');
-  //年単位で記録するシートを分けているので振り分け
-  var sheet_name = ''
-  if (buy_date.getFullYear() != 2022) {
-    sheet_name = '2022_List'
-  } else {
-    sheet_name = '2021_List'
-  }
+  var sheet_name = 'List'
 
   //家計簿シートに登録
   console.info('regist sheet start')
