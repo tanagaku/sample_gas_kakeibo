@@ -219,7 +219,7 @@ function doPost(e) {
     }
     //メッセージのバリデートチェック
     console.info('validateMessage start. message_parameter:' + message_parameter);
-    const validateResult = _validator__WEBPACK_IMPORTED_MODULE_0__.validateRegistMessage(message_parameter);
+    const validateResult = _validator__WEBPACK_IMPORTED_MODULE_0__.validateRegistMessage(message_parameter, _constant__WEBPACK_IMPORTED_MODULE_3__.CATEGORY_LIST, _constant__WEBPACK_IMPORTED_MODULE_3__.PAYMENT_STATUS_LIST, _constant__WEBPACK_IMPORTED_MODULE_3__.DAY_LIST);
     console.info('validateMessage end results:' + validateResult.result);
     if (!validateResult.result) {
         //メッセージ送信
@@ -402,40 +402,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "isDatePattern": () => (/* binding */ isDatePattern),
 /* harmony export */   "validateRegistMessage": () => (/* binding */ validateRegistMessage)
 /* harmony export */ });
-/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant */ "./src/constant.ts");
-
 /**
  * 送られてきたメッセージのバリデートチェック
  */
-function validateRegistMessage(message_parameter) {
+function validateRegistMessage(message_parameter, categoryList, paymentStatusList, dayList) {
     //message_parameterが指定の数かチェック
     if (message_parameter.length < 4) {
         return { 'result': false, 'message': 'カテゴリ、金額、購入日、支払いを入力してください。' };
     }
     //1行目の情報チェック(カテゴリ)
-    if (!message_parameter[0] || !_constant__WEBPACK_IMPORTED_MODULE_0__.CATEGORY_LIST.some(e => e.match(message_parameter[0]))) {
-        return { 'result': false, 'message': '1行目は、カテゴリを入力してください。\nカテゴリ:' + _constant__WEBPACK_IMPORTED_MODULE_0__.CATEGORY_LIST };
+    if (!message_parameter[0] || !categoryList.some(e => e.match(message_parameter[0]))) {
+        return { 'result': false, 'message': '1行目は、カテゴリを入力してください。\nカテゴリ:' + categoryList };
     }
     //2行目の情報チェック(金額)
     if (isNaN(message_parameter[1])) {
         return { 'result': false, 'message': '2行目は、金額を入力してください。' };
     }
     //3行目の情報チェック(購入日)
-    if (!isDatePattern(message_parameter[2])) {
+    if (!isDatePattern(message_parameter[2], dayList)) {
         return { 'result': false, 'message': '3行目は、購入日を入力してください。' };
     }
     //4行目の情報チェック(支払い状況)
-    if (!message_parameter[3] || !_constant__WEBPACK_IMPORTED_MODULE_0__.PAYMENT_STATUS_LIST.some(e => e.match(message_parameter[3]))) {
-        return { 'result': false, 'message': '4行目は、支払い状況を入力してください。\n支払い状況:' + _constant__WEBPACK_IMPORTED_MODULE_0__.PAYMENT_STATUS_LIST };
+    if (!message_parameter[3] || !paymentStatusList.some(e => e.match(message_parameter[3]))) {
+        return { 'result': false, 'message': '4行目は、支払い状況を入力してください。\n支払い状況:' + paymentStatusList };
     }
     return { 'result': true, 'message': '' };
 }
 //日付入力パターン似合っているチェック
-function isDatePattern(post_message) {
+function isDatePattern(post_message, dayList) {
     if (!post_message) {
         return false;
     }
-    if (_constant__WEBPACK_IMPORTED_MODULE_0__.DAY_LIST.some(e => e.match(post_message))) {
+    if (dayList.some(e => e.match(post_message))) {
         return true;
     }
     const now = new Date();
