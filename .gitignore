@@ -4,5 +4,4 @@ creds.json
 node_modules
 .vscode
 coverage
-#validator.test.tsはGAS関数のmock化ができたらあげる
-src/test/validator.test.ts
+

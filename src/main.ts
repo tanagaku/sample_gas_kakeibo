@@ -2,7 +2,7 @@ import * as validator from './validator';
 import * as date_util from './date_util';
 import * as line_fetch from './line_fetch';
 
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, TOTAL_SHEET_NAME, DELETE, ACCOUNT_LIST, SHEET_ID } from './constant';
+import { CATEGORY_LIST, PAYMENT_STATUS_LIST, HELP_MESSAGE, HELP_MESSAGE_LIST, TOTAL_SHEET_NAME, DELETE, ACCOUNT_LIST, SHEET_ID, DAY_LIST } from './constant';
 
 
 export function doPost(e: any) {
@@ -53,7 +53,7 @@ export function doPost(e: any) {
 
   //メッセージのバリデートチェック
   console.info('validateMessage start. message_parameter:' + message_parameter)
-  const validateResult = validator.validateRegistMessage(message_parameter)
+  const validateResult = validator.validateRegistMessage(message_parameter, CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST)
   console.info('validateMessage end results:' + validateResult.result)
 
   if (!validateResult.result) {

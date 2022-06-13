@@ -1,10 +1,7 @@
-import { CATEGORY_LIST, PAYMENT_STATUS_LIST, DAY_LIST } from './constant';
-
-
 /**
  * 送られてきたメッセージのバリデートチェック
  */
-export function validateRegistMessage(message_parameter: any[]): { result: boolean; message: string } {
+export function validateRegistMessage(message_parameter: any[], categoryList: string[], paymentStatusList: string[], dayList: string[]): { result: boolean; message: string } {
 
   //message_parameterが指定の数かチェック
   if (message_parameter.length < 4) {
@@ -12,31 +9,31 @@ export function validateRegistMessage(message_parameter: any[]): { result: boole
   }
 
   //1行目の情報チェック(カテゴリ)
-  if (!message_parameter[0] || !CATEGORY_LIST.some(e => e.match(message_parameter[0]))) {
-    return { 'result': false, 'message': '1行目は、カテゴリを入力してください。\nカテゴリ:' + CATEGORY_LIST }
+  if (!message_parameter[0] || !categoryList.some(e => e.match(message_parameter[0]))) {
+    return { 'result': false, 'message': '1行目は、カテゴリを入力してください。\nカテゴリ:' + categoryList }
   }
   //2行目の情報チェック(金額)
   if (isNaN(message_parameter[1])) {
     return { 'result': false, 'message': '2行目は、金額を入力してください。' }
   }
   //3行目の情報チェック(購入日)
-  if (!isDatePattern(message_parameter[2])) {
+  if (!isDatePattern(message_parameter[2], dayList)) {
     return { 'result': false, 'message': '3行目は、購入日を入力してください。' }
   }
   //4行目の情報チェック(支払い状況)
-  if (!message_parameter[3] || !PAYMENT_STATUS_LIST.some(e => e.match(message_parameter[3]))) {
-    return { 'result': false, 'message': '4行目は、支払い状況を入力してください。\n支払い状況:' + PAYMENT_STATUS_LIST }
+  if (!message_parameter[3] || !paymentStatusList.some(e => e.match(message_parameter[3]))) {
+    return { 'result': false, 'message': '4行目は、支払い状況を入力してください。\n支払い状況:' + paymentStatusList }
   }
   return { 'result': true, 'message': '' }
 }
 
 //日付入力パターン似合っているチェック
-export function isDatePattern(post_message: string) {
+export function isDatePattern(post_message: string, dayList: string[]) {
   if (!post_message) {
     return false
   }
 
-  if (DAY_LIST.some(e => e.match(post_message))) {
+  if (dayList.some(e => e.match(post_message))) {
     return true
   }
 
